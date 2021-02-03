@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-//import CreateUser from './CreateUser/CreateUserStack';
+import CreateUser from './CreateUser/CreateUserScreen';
 import LoginScreen from './LoginScreen';
 
 const { Navigator, Screen } = createStackNavigator();
@@ -12,7 +12,7 @@ const LoginStack = () => {
         headerShown: false
       }}>
       <Screen name="LoginScreen" component={LoginScreen} />
-
+      <Screen name="CreateUser" component={CreateUser} />
     </Navigator>
   );
 };/*<Screen name="CreateUser" component={CreateUser} /> */
