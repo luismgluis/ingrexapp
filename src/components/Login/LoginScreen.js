@@ -6,12 +6,13 @@ class loginScreen extends Component {
     this.props.navigation.navigate('CreateUser');
   };
   goToHome() {
+    console.log('pepe');
 
   }
   render() {
     return (
       <Layout style={{ paddingTop: 20, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text category='h1'>HOME</Text>
+        <Text category='h1'>Login</Text>
         <Divider />
         <Button onPress={this.handlePress}>Hola</Button>
       </Layout>
