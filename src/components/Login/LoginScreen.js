@@ -1,17 +1,20 @@
-import React, {Component} from 'react';
-import {View, Text, Pressable} from 'react-native';
+import { Button, Divider, Layout, Text } from '@ui-kitten/components';
+import React, { Component } from 'react';
 class loginScreen extends Component {
-  handlePress = () => {
+  handlePress() {
     console.log('hola');
+    this.props.navigation.navigate('CreateUser');
   };
+  goToHome() {
+
+  }
   render() {
     return (
-      <View>
-        <Text>hla</Text>
-        <Pressable onPress={this.handlePress}>
-          <Text>Hola</Text>
-        </Pressable>
-      </View>
+      <Layout style={{ paddingTop: 20, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text category='h1'>HOME</Text>
+        <Divider />
+        <Button onPress={this.handlePress}>Hola</Button>
+      </Layout>
     );
   }
 }

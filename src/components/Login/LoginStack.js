@@ -1,18 +1,19 @@
-import React, {Component} from 'react';
-import {View, Text, Pressable} from 'react-native';
-class LoginStack extends Component {
-  handlePress = () => {
-    console.log('hola');
-  };
-  render() {
-    return (
-      <View>
-        <Text>hla</Text>
-        <Pressable onPress={this.handlePress}>
-          <Text>Hola</Text>
-        </Pressable>
-      </View>
-    );
-  }
-}
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
+import CreateUser from '../CreateUser/CreateUser';
+import LoginScreen from './LoginScreen';
+
+const { Navigator, Screen } = createStackNavigator();
+const LoginStack = () => {
+  return (
+    <Navigator
+      headerMode='none'
+      screenOptions={{
+        headerShown: false
+      }}>
+      <Screen name="LoginScreen" component={LoginScreen} />
+      <Screen name="CreateUser" component={CreateUser} />
+    </Navigator>
+  );
+};
 export default LoginStack;

@@ -8,30 +8,24 @@
 
 import 'react-native-gesture-handler';
 import React from 'react';
-import {Text} from 'react-native';
-/*import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen'; */
-import {NavigationContainer} from '@react-navigation/native';
+import * as eva from '@eva-design/eva';
+import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+
+import LoginStack from './src/components/Login/LoginStack';
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Text>hola</Text>
-    </NavigationContainer>
+    <>
+      <IconRegistry icons={EvaIconsPack} />
+        <ApplicationProvider {...eva} theme={eva.light}>
+          <NavigationContainer>
+            <LoginStack />
+          </NavigationContainer>
+        </ApplicationProvider>
+    </>
   );
 };
 
