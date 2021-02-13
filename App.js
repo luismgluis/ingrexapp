@@ -43,7 +43,7 @@ const NavigatorApp = () => {
   });
   const getScreen = () => {
     console.log("getscreen");
-    if (typeof myuser.uid !== "undefined") {
+    if (typeof myuser?.uid !== "undefined") {
       if (myuser.uid !== "") {
         return <Screen name="HomeStack" component={HomeStack} />;
       }
