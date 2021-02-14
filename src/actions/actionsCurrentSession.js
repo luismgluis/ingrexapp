@@ -1,5 +1,5 @@
 import axios from "axios";
-import auth from "@react-native-firebase/auth";
+//import auth from "@react-native-firebase/auth";
 
 export const traerTodos = () => async (dispatch) => {
   const respuesta = await axios.get(

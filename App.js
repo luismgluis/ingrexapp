@@ -23,7 +23,7 @@ import HomeStack from "./src/components/Pages/Home/HomeStack";
 import LoginStack from "./src/components/Pages/Login/LoginStack";
 import reducers from "./src/reducers/index";
 import * as sessionActions from "./src/actions/actionsCurrentSession";
-import auth from "@react-native-firebase/auth";
+//import auth from "@react-native-firebase/auth";
 
 const store = createStore(
   reducers, // Reducers
@@ -38,9 +38,11 @@ const NavigatorApp = () => {
   const myuser = useSelector((store) => {
     return store.currentSession.user;
   });
+  /*
   auth().onAuthStateChanged((data) => {
     dispatch(sessionActions.updateCurrentUser(data));
   });
+   */
   const getScreen = () => {
     console.log("getscreen");
     if (typeof myuser?.uid !== "undefined") {
