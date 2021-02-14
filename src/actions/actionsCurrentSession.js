@@ -1,5 +1,5 @@
 import axios from "axios";
-//import auth from "@react-native-firebase/auth";
+import auth from "@react-native-firebase/auth";
 
 export const traerTodos = () => async (dispatch) => {
   const respuesta = await axios.get(
@@ -38,8 +38,14 @@ export const loginWithEmail = (user, password) => async (dispatch) => {
 };
 
 export const updateCurrentUser = (userData) => async (dispatch) => {
-  dispatch({
-    type: "updateCurrentUser",
-    payload: userData,
-  });
+  if (typeof userData !== "undefined") {
+    if (userData !== null) {
+      dispatch({
+        type: "updateCurrentUser",
+        payload: userData,
+      });
+      return;
+    }
+  }
+  console.log("Update Current User but is null or undefined");
 };
