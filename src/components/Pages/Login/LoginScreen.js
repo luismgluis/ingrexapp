@@ -24,11 +24,6 @@ const LoginScreen = (props) => {
 
   const dispatch = useDispatch();
 
-  const myuser = useSelector((store) => {
-    return store.currentSession.user;
-  });
-
-
   const toggleSecureEntry = () => {
     setSecureTextEntry(!secureTextEntry);
   };

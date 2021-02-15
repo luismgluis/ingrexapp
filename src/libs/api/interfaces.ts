@@ -1,11 +1,6 @@
-export interface Business {
-    color?: string;
-    width?: number;
-}
+import User from "./base/user";
+import Business from "./base/business";
 
-export interface Product {
-    uid?: string;
-    name?: number;
-    loadUser(uid: string): any;
-    getDescription(limitCharts: number): string;
-}
+export { User };
+
+export { Business };

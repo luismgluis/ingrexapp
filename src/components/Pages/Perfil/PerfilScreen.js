@@ -1,15 +1,17 @@
 import { Layout } from "@ui-kitten/components";
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
 import FeedImages from "./../../UI/FeedImages/FeedImages";
 import PerfilHeader from "./../../UI/PerfilHeader/PerfilHeader";
 import SelectPerfil from "./../../UI/SelectPerfil/SelectPerfil";
+import Api from "./../../../libs/api/api";
+import Alert from "./../../../libs/alert/alert";
 const MySelectPerfil = () => {
   const action = (key) => {
     console.log(key);
   }
-  const dropOptions = [
+  const dropOptionsDefault = [
     {
       title: "EmpresaX",
       onPress: () => { action("option1") },
@@ -21,6 +23,18 @@ const MySelectPerfil = () => {
       iconName: "plus-outline"
     }
   ]
+  const [dropOptions, setDropOptions] = useState(dropOptionsDefault);
+  const getOptions = useCallback(() => {
+    Api.getMyBusiness().then((data) => {
+      console.log(data);
+    }).catch((error) => {
+      console.log(error);
+      Alert.show("Fail", "Can't get user business")
+    })
+  })
+  useEffect(() => {
+    getOptions();
+  }, [])
   return (
     <SelectPerfil
       dropTitle={dropOptions[0].title}

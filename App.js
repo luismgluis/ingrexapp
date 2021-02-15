@@ -48,8 +48,6 @@ const NavigatorApp = () => {
     authChange();
   }, [])
 
-  /* */
-
   const getScreen = () => {
     console.log("getscreen");
     if (typeof myuser?.uid !== "undefined") {
