@@ -11,7 +11,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
-import React from "react";
+import React, { useEffect, useCallback } from "react";
 import "react-native-gesture-handler";
 
 import { Provider } from "react-redux";
@@ -21,6 +21,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import HomeStack from "./src/components/Pages/Home/HomeStack";
 import LoginStack from "./src/components/Pages/Login/LoginStack";
+import Gallery from "./src/components/Pages/Gallery/GalleryStack";
 import reducers from "./src/reducers/index";
 import * as sessionActions from "./src/actions/actionsCurrentSession";
 import auth from "@react-native-firebase/auth";
@@ -38,9 +39,17 @@ const NavigatorApp = () => {
   const myuser = useSelector((store) => {
     return store.currentSession.user;
   });
-  auth().onAuthStateChanged((data) => {
-    dispatch(sessionActions.updateCurrentUser(data));
-  });
+  const authChange = useCallback(() => {
+    auth().onAuthStateChanged((data) => {
+      dispatch(sessionActions.updateCurrentUser(data));
+    });
+  })
+  useEffect(() => {
+    authChange();
+  }, [])
+
+  /* */
+
   const getScreen = () => {
     console.log("getscreen");
     if (typeof myuser?.uid !== "undefined") {
@@ -56,6 +65,7 @@ const NavigatorApp = () => {
       initialRouteName="LoginStack"
       screenOptions={{ headerShown: false }}>
       {getScreen()}
+      <Screen name="GalleryCustom" component={Gallery} />
     </Navigator>
   ); //
 };

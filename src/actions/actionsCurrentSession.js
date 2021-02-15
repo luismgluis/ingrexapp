@@ -11,7 +11,7 @@ export const traerTodos = () => async (dispatch) => {
   });
 };
 
-export const loginWithEmail = (user, password) => async (dispatch) => {
+export const loginWithEmail = (user, password, callBackFail = null) => async (dispatch) => {
   console.log("login with ", user);
   auth() //'grajales805@gmail.com', 'elpepe'
     .signInWithEmailAndPassword(user, password)
@@ -34,6 +34,9 @@ export const loginWithEmail = (user, password) => async (dispatch) => {
       }
 
       console.error(error);
+      if (callBackFail !== null) {
+        callBackFail(false);
+      }
     });
 };
 

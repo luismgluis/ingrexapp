@@ -1,8 +1,10 @@
 import { Layout, Text } from "@ui-kitten/components";
 import React, { useState } from "react";
-import { Dimensions, FlatList, StyleSheet, View } from "react-native";
+import { Dimensions, FlatList, Image, StyleSheet, View } from "react-native";
+import { color } from "react-native-reanimated";
 import Utils from "./../../../libs/utils/utils";
 import SelectPerfil from "./../SelectPerfil/SelectPerfil";
+
 const win = Dimensions.get("window");
 let items = [];
 let itemsO = [];
@@ -28,12 +30,35 @@ function initializeData() {
   }
 }
 initializeData();
-
+function initialParseData(data) {
+  let dataResult = [];
+  for (const key in data) {
+    if (!Object.hasOwnProperty.call(data, key)) {
+      continue;
+    }
+    const element = data[key];
+    element.key = key;
+    element.date = "";
+    if (typeof element.timestamp !== "undefined") {
+      element.name = Utils.dates.unixToString(element.timestamp, true);
+    }
+    if (typeof element.name == "undefined") {
+      element.name = `item${key}`;
+    }
+    dataResult.push(element);
+  }
+  return dataResult;
+}
 const renderBox = (data) => {
+  if (typeof data.uri == "undefined") {
+    return <></>
+  }
+  const theKey = Utils.generateKey(`feedimages${data.key}`);
   return (
-    <View key={data.key} style={styles.box}>
-      <Text key={`t${data.key}`} style={styles.title}>
-        {data.name + "----"}
+    <View key={theKey} style={styles.box}>
+      <Image style={styles.boxImage} source={{ uri: data.uri }} ></Image>
+      <Text category="s1" key={`t_${theKey}`} style={styles.boxTitle}>
+        {data.name}
       </Text>
     </View>
   );
@@ -42,7 +67,10 @@ const renderItem = ({ item }) => {
   return renderBox(item);
 };
 
-const FeedImages = (props) => {
+const FeedImages = ({ arrayImages }) => {
+  itemsO = Array.isArray(arrayImages) ? arrayImages : [];
+  itemsO = initialParseData(itemsO);
+  console.log("itemsO");
   return (
     <Layout style={styles.container}>
       <View style={styles.view1}>
@@ -61,7 +89,7 @@ const FeedImages = (props) => {
     </Layout>
   );
 };
-
+const marginXbox = 2;
 const styles = StyleSheet.create({
   container: { flex: 12 },
   view1: {
@@ -71,9 +99,26 @@ const styles = StyleSheet.create({
   view2: { flex: 12 },
   content: { flex: 12 },
   box: {
-    backgroundColor: "cyan",
+    backgroundColor: "gray",
+    width: (win.width / 3) - marginXbox - (2),
+    height: (win.width / 3),
+    borderRadius: 4,
+    overflow: "hidden",
+    marginTop: marginXbox,
+    marginRight: marginXbox
+  },
+  boxImage: {
+    flex: 1,
     width: win.width / 3,
     height: win.width / 3,
   },
+  boxTitle: {
+    position: "absolute",
+    bottom: 0,
+    color: "white",
+    width: "100%",
+    backgroundColor: "#0000005e",
+    paddingHorizontal: 5,
+  }
 });
 export default FeedImages;

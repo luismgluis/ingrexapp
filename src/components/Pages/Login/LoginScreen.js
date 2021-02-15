@@ -8,9 +8,10 @@ import {
   Text,
 } from "@ui-kitten/components";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, TouchableWithoutFeedback, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import * as sessionActions from "./../../../actions/actionsCurrentSession";
+
 
 const LoginScreen = (props) => {
   console.log("props", props);
@@ -27,16 +28,27 @@ const LoginScreen = (props) => {
     return store.currentSession.user;
   });
 
+
   const toggleSecureEntry = () => {
     setSecureTextEntry(!secureTextEntry);
   };
   const checkLogin = () => {
+    //ImagePicker.getAlbum();props.navigation.navigate("GalleryCustom");
     setLoadSpinner(true);
     setTimeout(() => {
       setLoadSpinner(false);
     }, 3000);
-    dispatch(sessionActions.loginWithEmail(user, password));
-    return false;
+    dispatch(sessionActions.loginWithEmail(user, password, () => {
+      setLoadSpinner(false);
+      Alert.alert(
+        "Login fail",
+        "Check data and try again",
+        [
+          { text: 'OK', onPress: () => console.log('OK Pressed') }
+        ],
+        { cancelable: false }
+      );
+    }));
   };
   const createAccount = () => {
     return "";
@@ -50,20 +62,10 @@ const LoginScreen = (props) => {
       <Icon {...props1} name={secureTextEntry ? "eye-off" : "eye"} />
     </TouchableWithoutFeedback>
   );
-  const Title = () => {
-    /*const count = useSelector((store) => {
-      return store.currentSession;
-    });
-    setTimeout(() => {
-      dispatch(sessionActions.traerTodos());
-    }, 5000);
-    console.log(count);{count.users.length} */
-    return <Text category="h1">Bienvenido </Text>;
-  };
 
   return (
     <Layout style={styles.container}>
-      <Title />
+      <Text category="h4">Bienvenido</Text>
       <Divider style={styles.divider} />
       <Text category="h6">Ingresa tus datos</Text>
       <Layout style={styles.panel}>
@@ -95,9 +97,7 @@ const LoginScreen = (props) => {
       {loadSpinner && (
         <>
           <Spinner size="giant" status="info" />
-          <Button appearance="ghost" onPress={createAccount}>
-            Create Account
-          </Button>
+          <Button appearance="ghost" onPress={createAccount}>Create Account</Button>
         </>
       )}
     </Layout>

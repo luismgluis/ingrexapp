@@ -1,7 +1,7 @@
-import { Button, Icon, Layout, Popover, Text } from "@ui-kitten/components";
+import { Button, MenuItem, Icon, Layout, OverflowMenu, Text } from "@ui-kitten/components";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { set } from "react-native-reanimated";
+import Utils from "./../../../libs/utils/utils";
 import CSearch from "./../../UI/CSearch/CSearch";
 
 const renderOptionButton = (icon, actionFn) => {
@@ -37,43 +37,68 @@ const renderToggleButton = (title, action) => {
   };
 };
 
-const DropDownElements = ({ title, visible, setVisible }) => {
+const DropDownElements = ({ title, options = [] }) => {
   console.log("renderdrop");
+  const [customTitle, setcustomTitle] = useState(title);
+  const [customVisible, setCustomVisible] = useState(false);
+  const customIcon = (name) => {
+    return (props) => {
+      return (<Icon {...props} name={name} />)
+    };
+  }
+  let menuItems = [];
+  for (const key in options) {
+    if (!Object.hasOwnProperty.call(options, key)) {
+      continue;
+    }
+    const element = options[key];
+    menuItems.push(<MenuItem
+      onPress={() => {
+        setCustomVisible(false);
+        setcustomTitle(element.title);
+        element.onPress();
+      }}
+      key={Utils.generateKey("DropOption")}
+      accessoryLeft={customIcon(element.iconName)}
+      title={element.title} />)
+  }
+  if (menuItems.length == 0) {
+    menuItems.push(<MenuItem
+      key={Utils.generateKey("DropOption")}
+      accessoryLeft={customIcon("close-outline")}
+      title="Close" />)
+  }
   return (
-    <Popover
-      anchor={renderToggleButton(title, function () {
-        setVisible(true);
+    <OverflowMenu
+      anchor={renderToggleButton(customTitle, function () {
+        setCustomVisible(true);
       })}
-      visible={visible}
-      placement="bottom"
-      onBackdropPress={() => setVisible(false)}>
-      <Layout style={styles.content}>
-        <Icon style={styles.icon} fill="#8F9BB3" name="star" />
-        <Text>Welcome to UI Kitten 😻</Text>
-      </Layout>
-    </Popover>
-  );
+      visible={customVisible}
+      onBackdropPress={() => setCustomVisible(false)}>
+      {menuItems}
+    </OverflowMenu>
+  )
 };
 
-const SelectPerfil = ({ searchEnabledOrg }) => {
-  const [visible, setVisible] = useState(false);
-  const [title, setTitle] = useState("Titulo");
-  const [searchEnabled, setSearchEnabled] = useState(true);
-  if (typeof searchEnabledOrg !== "undefined") {
-    setSearchEnabled(searchEnabledOrg);
-  }
+const SelectPerfil = ({
+  searchEnabledOrg = false,
+  dropTitle = "",
+  dropOptions = [],
+}) => {
+
+  const [title, setTitle] = useState(dropTitle);
+  const [searchEnabled, setSearchEnabled] = useState(searchEnabledOrg);
 
   return (
     <Layout style={styles.container}>
       <View style={styles.panelOne}>
         <DropDownElements
           title={title}
-          visible={visible}
-          setVisible={setVisible}
+          options={dropOptions}
         />
       </View>
       <Layout style={styles.panelTwo}>
-        {renderOptionButton("star", () => {
+        {renderOptionButton("more-vertical", () => {
           setTitle("EMPRESA X");
         })}
         {searchEnabled && <CSearch />}

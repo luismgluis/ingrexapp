@@ -1,6 +1,5 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import * as actionsCurrentSession from "./../../../actions/actionsCurrentSession";
 import CreateUser from "./CreateUser/CreateUserScreen";
 import LoginScreen from "./LoginScreen";
 

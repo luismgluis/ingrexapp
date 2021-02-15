@@ -5,12 +5,35 @@ import { StyleSheet, View } from "react-native";
 import FeedImages from "./../../UI/FeedImages/FeedImages";
 import PerfilHeader from "./../../UI/PerfilHeader/PerfilHeader";
 import SelectPerfil from "./../../UI/SelectPerfil/SelectPerfil";
-
+const MySelectPerfil = () => {
+  const action = (key) => {
+    console.log(key);
+  }
+  const dropOptions = [
+    {
+      title: "EmpresaX",
+      onPress: () => { action("option1") },
+      iconName: "briefcase-outline"
+    },
+    {
+      title: "Crear",
+      onPress: () => { action("option2") },
+      iconName: "plus-outline"
+    }
+  ]
+  return (
+    <SelectPerfil
+      dropTitle={dropOptions[0].title}
+      dropOptions={dropOptions}
+      searchEnabled={false} />
+  )
+}
 const PerfilScreen = () => {
+
   return (
     <View style={styles.father}>
       <Layout style={styles.panelOne}>
-        <SelectPerfil searchEnabled={false} />
+        <MySelectPerfil />
       </Layout>
       <View style={styles.view0}>
         <View style={styles.view1}>
