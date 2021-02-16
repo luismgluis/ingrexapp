@@ -7,26 +7,48 @@ import PerfilHeader from "./../../UI/PerfilHeader/PerfilHeader";
 import SelectPerfil from "./../../UI/SelectPerfil/SelectPerfil";
 import Api from "./../../../libs/api/api";
 import Alert from "./../../../libs/alert/alert";
+import { useSelector, useDispatch } from "react-redux";
+import * as actionsGeneral from "./../../../actions/actionsGeneral";
+
 const MySelectPerfil = () => {
+  const counter = useSelector(state => {
+    console.log(state);
+  })
+  const dispatch = useDispatch()
+
   const action = (key) => {
+    if (key == null) {
+      return;
+    }
     console.log(key);
+    dispatch(actionsGeneral.setActualBusiness({ name: key }))
   }
   const dropOptionsDefault = [
     {
-      title: "EmpresaX",
-      onPress: () => { action("option1") },
-      iconName: "briefcase-outline"
-    },
-    {
       title: "Crear",
-      onPress: () => { action("option2") },
-      iconName: "plus-outline"
+      onPress: () => { action(null) },
+      iconName: "plus-outline",
+      systemOption: true
     }
-  ]
-  const [dropOptions, setDropOptions] = useState(dropOptionsDefault);
+  ];
+  const [dropOptions, setDropOptions] = useState([]);
   const getOptions = useCallback(() => {
     Api.getMyBusiness().then((data) => {
-      console.log(data);
+      let replaceArray = [...dropOptionsDefault].slice();
+      for (const key in data) {
+        if (!Object.hasOwnProperty.call(data, key)) {
+          continue;
+        }
+        const business = data[key];
+        const newItem = {
+          title: business.name.toUpperCase(),
+          onPress: () => { action(business) },
+          iconName: "briefcase-outline",
+          systemOption: false
+        }
+        replaceArray.unshift(newItem);
+      }
+      setDropOptions(replaceArray);
     }).catch((error) => {
       console.log(error);
       Alert.show("Fail", "Can't get user business")
@@ -37,7 +59,6 @@ const MySelectPerfil = () => {
   }, [])
   return (
     <SelectPerfil
-      dropTitle={dropOptions[0].title}
       dropOptions={dropOptions}
       searchEnabled={false} />
   )

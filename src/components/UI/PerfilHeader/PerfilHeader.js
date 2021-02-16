@@ -1,66 +1,58 @@
 'use strict'
 import { Avatar, Divider, Layout, Text } from '@ui-kitten/components';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import CButton from '../CButton/CButton';
 import CIcon from '../CIcon/CIcon';
 
-
-class PerfilHeader extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            avatarVisible: false
-        };
-        /* */
-    }
-    getPerfilImage(withAvatar) {
+const PerfilHeader = () => {
+    const [avatarVisible, setAvatarVisible] = useState(false);
+    const getPerfilImage = (withAvatar) => {
         if (withAvatar) {
             return (
                 <Avatar style={styles.avatar}
                     size='giant'
-                    source={require('../../../assets/perfil/user.png')} />)
+                    source={require('../../../assets/perfil/user.png')} />
+            )
         } else {
             return (<CIcon style={styles.avatar} />)
         }
     };
-    componentDidMount() {
-        return
-    }
-    render() {
-        const context = this;
-        return (
-            <Layout style={styles.container} level="1">
-                <Layout style={styles.containerTop}>
-                    <Layout style={styles.panelLeft} >
-                        {this.state.avatarVisible == true &&
-                            this.getPerfilImage(true)}
-                        {this.state.avatarVisible == false &&
-                            this.getPerfilImage(false)}
-                    </Layout>
-                    <Layout style={styles.panelRight}>
-                        <Layout>
-                            <Text category="h5" >Fulano suntano</Text>
-                            <Text category="s2">Empresa Cocoa</Text>
-                            <Divider />
-                            <Text
-                                style={styles.description}
-                                category="s1">Esta es una super empresa</Text>
-                        </Layout>
-                    </Layout>
+
+    return (
+        <Layout style={styles.container} level="1">
+            <Layout style={styles.containerTop}>
+                <Layout style={styles.panelLeft} >
+                    {avatarVisible &&
+                        getPerfilImage(true)}
+                    {!avatarVisible &&
+                        getPerfilImage(false)}
                 </Layout>
-                <Layout style={styles.containerBottom}>
-                    <Layout style={styles.panelActions}>
-                        <CButton icon={"activity-outline"}
-                            type="primary" textButton="Hola" />
-                        <CButton icon={"activity-outline"} />
-                        <CButton icon={"activity-outline"} />
+                <Layout style={styles.panelRight}>
+                    <Layout>
+                        <Text category="h5" >Fulano suntano</Text>
+                        <Text category="s2">Empresa Cocoa</Text>
+                        <Divider />
+                        <Text
+                            style={styles.description}
+                            category="s1">Esta es una super empresa</Text>
                     </Layout>
                 </Layout>
             </Layout>
-        );
-    }
-}
+            <Layout style={styles.containerBottom}>
+                <Layout style={styles.panelActions}>
+                    <CButton icon={"plus-outline"}
+                        type="primary" textButton="Product" />
+                    <CButton icon={"plus-outline"} textButton="Product" />
+                    <CButton icon={"activity-outline"} />
+                </Layout>
+            </Layout>
+        </Layout>
+    );
+};
+
+export default PerfilHeader;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -113,4 +105,3 @@ const styles = StyleSheet.create({
     },
 
 })
-export default PerfilHeader;

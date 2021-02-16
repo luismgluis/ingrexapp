@@ -19,8 +19,11 @@ const renderOptionButton = (icon, actionFn) => {
   );
 };
 
-const renderToggleButton = (title, action) => {
+const renderToggleButton = (title, cicon = "star", action) => {
   const theIconLeft = (props1) => {
+    return <Icon {...props1} name={cicon} />;
+  };
+  const theIconRight = (props1) => {
     return <Icon {...props1} name="chevron-down-outline" />;
   };
   return () => {
@@ -29,7 +32,8 @@ const renderToggleButton = (title, action) => {
         style={styles.buttonToggle}
         status="basic"
         appearance="ghost"
-        accessoryRight={theIconLeft}
+        accessoryLeft={theIconLeft}
+        accessoryRight={theIconRight}
         onPress={() => action(true)}>
         {title}
       </Button>
@@ -37,11 +41,12 @@ const renderToggleButton = (title, action) => {
   };
 };
 
-const DropDownElements = ({ title, options = [] }) => {
+const DropDownElements = ({ options = [] }) => {
   console.log("renderdrop");
-  const [customTitle, setcustomTitle] = useState(title);
+  const [customTitle, setcustomTitle] = useState("");
   const [customVisible, setCustomVisible] = useState(false);
-  const customIcon = (name) => {
+  const [customIcon, setCustomIcon] = useState("star");
+  const customIconLayout = (name) => {
     return (props) => {
       return (<Icon {...props} name={name} />)
     };
@@ -52,25 +57,35 @@ const DropDownElements = ({ title, options = [] }) => {
       continue;
     }
     const element = options[key];
+    if (customTitle == "" && element.systemOption == false) {
+      setcustomTitle(element.title);
+      setCustomIcon(element.iconName)
+    }
+
     menuItems.push(<MenuItem
       onPress={() => {
-        setCustomVisible(false);
-        setcustomTitle(element.title);
         element.onPress();
+        setCustomVisible(false);
+        if (element.systemOption) {
+          return;
+        }
+        setcustomTitle(element.title);
+        setCustomIcon(element.iconName);
       }}
       key={Utils.generateKey("DropOption")}
-      accessoryLeft={customIcon(element.iconName)}
+      accessoryLeft={customIconLayout(element.iconName)}
       title={element.title} />)
   }
   if (menuItems.length == 0) {
     menuItems.push(<MenuItem
       key={Utils.generateKey("DropOption")}
-      accessoryLeft={customIcon("close-outline")}
+      accessoryLeft={customIconLayout("close-outline")}
       title="Close" />)
   }
+
   return (
     <OverflowMenu
-      anchor={renderToggleButton(customTitle, function () {
+      anchor={renderToggleButton(customTitle, customIcon, function () {
         setCustomVisible(true);
       })}
       visible={customVisible}
@@ -82,18 +97,16 @@ const DropDownElements = ({ title, options = [] }) => {
 
 const SelectPerfil = ({
   searchEnabledOrg = false,
-  dropTitle = "",
   dropOptions = [],
 }) => {
 
-  const [title, setTitle] = useState(dropTitle);
+  const [title, setTitle] = useState("");
   const [searchEnabled, setSearchEnabled] = useState(searchEnabledOrg);
 
   return (
     <Layout style={styles.container}>
       <View style={styles.panelOne}>
         <DropDownElements
-          title={title}
           options={dropOptions}
         />
       </View>

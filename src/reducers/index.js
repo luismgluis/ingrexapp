@@ -3,8 +3,9 @@
 import { combineReducers } from "redux";
 import currentSession from "./currentSession";
 import feedImagesReducer from "./feedImagesReducer";
-
+import generalApp from "./generalApp";
 export default combineReducers({
     feedImagesReducer,
     currentSession,
+    generalApp
 });
