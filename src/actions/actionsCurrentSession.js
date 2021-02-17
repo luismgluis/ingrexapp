@@ -1,6 +1,6 @@
 import axios from "axios";
 import auth from "@react-native-firebase/auth";
-
+const TAG = "ACTIONS CURRENT SESSION";
 export const traerTodos = () => async (dispatch) => {
   const respuesta = await axios.get(
     "https://jsonplaceholder.typicode.com/users",
@@ -15,7 +15,7 @@ export const loginWithEmail = (user, password, callBack = null) => async (dispat
   auth() //'grajales805@gmail.com', 'elpepe'
     .signInWithEmailAndPassword(user, password)
     .then(() => {
-      console.log("User signed in!");
+      console.log(TAG, "User signed in!");
       const me = auth().currentUser;
       dispatch({
         type: "loginWithEmail",
@@ -26,14 +26,14 @@ export const loginWithEmail = (user, password, callBack = null) => async (dispat
       }
     })
     .catch((error) => {
-      console.log(error);
+      console.log(TAG, error);
 
       if (error.code === "auth/email-already-in-use") {
-        console.log("That email address is already in use!");
+        console.log(TAG, "That email address is already in use!");
       }
 
       if (error.code === "auth/invalid-email") {
-        console.log("That email address is invalid!");
+        console.log(TAG, "That email address is invalid!");
       }
 
       if (callBack !== null) {
@@ -52,5 +52,5 @@ export const updateCurrentUser = (userData) => async (dispatch) => {
       return;
     }
   }
-  console.log("Update Current User but is null or undefined");
+  console.log(TAG, "Update Current User but is null or undefined");
 };

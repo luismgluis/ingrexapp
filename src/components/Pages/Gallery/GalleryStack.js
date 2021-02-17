@@ -9,7 +9,8 @@ import { Button } from "@ui-kitten/components";
 const { Navigator, Screen } = createStackNavigator();
 
 const Gallery = (props) => {
-  console.log("Gallery", props);
+  const TAG = "GALLERY";
+  console.log(TAG, "Gallery", props);
 
   let callBack = () => { }
   try {
@@ -17,9 +18,9 @@ const Gallery = (props) => {
     if (typeof fn === "function") {
       callBack = fn;
     }
-    console.log(callBack);
+    console.log(TAG, callBack);
   } catch (error) {
-    console.log("fail in props gallery");
+    console.log(TAG, "fail in props gallery");
   }
 
   const [backButtonVisible, setBackButtonVisible] = useState(false);
@@ -43,7 +44,6 @@ const Gallery = (props) => {
   </Navigator>)
   const [permissionsEnabled, setPermissionsEnabled] = useState(false);
   let checkPermissions = useCallback(async () => {
-    console.log("useeee");
     let cameraGranted = await permissionsUtils.checkPermission(permissionsUtils.permissionsTypes.CAMERA);
     if (!cameraGranted) {
       cameraGranted = await permissionsUtils.requestCameraPermission();
@@ -69,7 +69,6 @@ const Gallery = (props) => {
     //setPermissionsEnabled(true);
   })
   useEffect(() => {
-    console.log("efeeect");
     checkPermissions()
   }, [])
 

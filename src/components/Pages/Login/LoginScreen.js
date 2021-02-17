@@ -8,13 +8,15 @@ import {
   Text,
 } from "@ui-kitten/components";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableWithoutFeedback, Alert } from "react-native";
+import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
+import alert from "../../../libs/alert/alert";
 import * as sessionActions from "./../../../actions/actionsCurrentSession";
 
+const TAG = "LOGIN SCREEN";
 
 const LoginScreen = (props) => {
-  console.log("props", props);
+  console.log(TAG, "props", props);
 
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [password, setPassword] = useState("elpepe");
@@ -28,21 +30,15 @@ const LoginScreen = (props) => {
     setSecureTextEntry(!secureTextEntry);
   };
   const checkLogin = () => {
-    //ImagePicker.getAlbum();props.navigation.navigate("GalleryCustom");
     setLoadSpinner(true);
-    setTimeout(() => {
+    dispatch(sessionActions.loginWithEmail(user, password, (result) => {
       setLoadSpinner(false);
-    }, 3000);
-    dispatch(sessionActions.loginWithEmail(user, password, () => {
-      setLoadSpinner(false);
-      Alert.alert(
-        "Login fail",
-        "Check data and try again",
-        [
-          { text: 'OK', onPress: () => console.log('OK Pressed') }
-        ],
-        { cancelable: false }
-      );
+      if (result) {
+        console.log(TAG, "Login OK");
+        return;
+      }
+      alert.show("Login fail",
+        "Check data and try again")
     }));
   };
   const createAccount = () => {

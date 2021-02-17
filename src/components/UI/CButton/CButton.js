@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Icon } from '@ui-kitten/components';
 import { StyleSheet, View } from 'react-native';
 
-const CButton = ({ styles = {}, icon, type, type2, textButton = "", onPress = () => { } }) => {
+const CButton = ({ styles = {}, icon, type = "", type2 = "", textButton = "", onPress = () => { } }) => {
     function MyIcon(icon) {
         return (props) => (
             <Icon {...props} name={icon} />//'star' />
@@ -14,11 +14,11 @@ const CButton = ({ styles = {}, icon, type, type2, textButton = "", onPress = ()
         stylesv = { ...styles };
     }
     let appearance = "false";
-    if (typeof type2 !== "undefined") {
+    if (type2 !== "") {
         appearance = type2;
     }
     let thetype = "basic";
-    if (typeof type !== "undefined") {
+    if (type !== "") {
         thetype = type;
     }
     stylesv.paddingHorizontal = 4;

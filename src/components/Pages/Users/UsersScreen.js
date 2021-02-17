@@ -4,16 +4,8 @@ import { StyleSheet } from 'react-native';
 
 class UsersScreen extends Component {
     handlePress() {
-        console.log('hola');
-        try {
-            console.log(this.props.route?.params?.user);
-        } catch (error) {
-            console.log('fail');
-
-        }
     };
     goToHome() {
-        console.log('home');
     }
     render() {
         return (

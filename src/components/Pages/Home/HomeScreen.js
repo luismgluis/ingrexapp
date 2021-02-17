@@ -13,6 +13,8 @@ import Utils from "../../../libs/utils/utils";
 import PerfilScreen from "../Perfil/PerfilScreen";
 const { Navigator, Screen } = createBottomTabNavigator();
 
+const TAG = "HOMESCREEN";
+
 const pages = {
   stats: {
     title: AppConfig.TextFields.pages.home.stats,
@@ -57,7 +59,7 @@ function initilializeTabsScreens() {
         icon={getIcon(page.iconName)}
       />,
     );
-    console.log("creating tabs");
+    console.log(TAG, "creating tabs");
   }
 }
 initilializeTabsScreens();

@@ -4,6 +4,8 @@ import { StyleSheet, View } from "react-native";
 import Utils from "./../../../libs/utils/utils";
 import CSearch from "./../../UI/CSearch/CSearch";
 
+const TAG = "SELECT PERFIL";
+
 const renderOptionButton = (icon, actionFn) => {
   const theIconLeft = (props1) => {
     return <Icon {...props1} name={icon} />;
@@ -42,7 +44,7 @@ const renderToggleButton = (title, cicon = "star", action) => {
 };
 
 const DropDownElements = ({ options = [] }) => {
-  console.log("renderdrop");
+  console.log(TAG, "renderdrop");
   const [customTitle, setcustomTitle] = useState("");
   const [customVisible, setCustomVisible] = useState(false);
   const [customIcon, setCustomIcon] = useState("star");
@@ -57,7 +59,7 @@ const DropDownElements = ({ options = [] }) => {
       continue;
     }
     const element = options[key];
-    if (customTitle == "" && element.systemOption == false) {
+    if (customTitle == "" && element.systemOption == false && element.active == true) {
       setcustomTitle(element.title);
       setCustomIcon(element.iconName)
     }

@@ -13,8 +13,6 @@ import * as sessionActions from "./src/actions/actionsCurrentSession";
 import auth from "@react-native-firebase/auth";
 import Api from "./src/libs/api/api";
 
-
-
 const { Navigator, Screen } = createStackNavigator();
 
 const AppNav = () => {
@@ -23,10 +21,6 @@ const AppNav = () => {
   const myuser = useSelector((store) => {
     return store.currentSession.user;
   });
-  const currentBusiness = useSelector((store) => {
-    return store.generalApp.currentBusiness;
-  });
-  Api.setCurrentBusiness(currentBusiness);
 
   const authChange = useCallback(() => {
     auth().onAuthStateChanged((data) => {

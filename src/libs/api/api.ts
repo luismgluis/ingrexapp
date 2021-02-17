@@ -2,12 +2,13 @@ import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { User, Business, Product } from "./interfaces";
-
+const TAG = "API";
 class Api {
   static instance: any;
   myuser: FirebaseAuthTypes.User;
   myinfo: User;
   currentBusiness: Business;
+  allBusiness: Array<Business>;
   constructor() {
     if (typeof Api.instance === "object") {
       return Api.instance;
@@ -16,6 +17,7 @@ class Api {
     this.myuser = auth().currentUser;
     this.myinfo = new User();
     this.currentBusiness = new Business();
+    this.allBusiness = null;
     return this;
   }
   async checkDefaults() {
@@ -38,7 +40,7 @@ class Api {
     let resBusiness: Array<Business> = [];
     result.forEach((doc) => {
       const data = doc.data();
-      console.log(data);
+      console.log(TAG, data);
       const buss = new Business(doc.id, data);
       resBusiness.push(buss);
     });
@@ -50,8 +52,14 @@ class Api {
   }
   async getMyBusiness(): Promise<Array<Business>> {
     await this.checkDefaults();
-    const theBusiness = this.getBusinessByArrIds(this.myinfo.business);
-    return theBusiness;
+    if (this.allBusiness == null) {
+      const theBusiness = await this.getBusinessByArrIds(this.myinfo.business);
+      this.allBusiness = theBusiness;
+    }
+    if (this.currentBusiness.isEmpty()) {
+      this.currentBusiness = this.allBusiness[0];
+    }
+    return this.allBusiness;
   }
   setCurrentBusiness(business: Business) {
     if (!(business instanceof Business)) {
@@ -72,13 +80,13 @@ class Api {
         return null;
       }
       if (newProd.isEmpty()) {
-        console.log("SaveProduct is empty");
+        console.log(TAG, "SaveProduct is empty");
         return null;
       }
-      console.log("saveproduct");
+      console.log(TAG, "saveproduct");
       const myCollection = firestore().collection("products");
       const result = await myCollection.add(newProd);
-      console.log("saveProduct Add", result);
+      console.log(TAG, "saveProduct Add", result);
       if (typeof result.id == "undefined") {
         return null;
       }
@@ -88,17 +96,18 @@ class Api {
       const task = reference.putFile(imageUri);
       task.on("state_changed", (taskSnapshot) => {
         console.log(
+          TAG,
           `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
         );
       });
       task.then(() => {
-        console.log("Image uploaded to the bucket!");
+        console.log(TAG, "Image uploaded to the bucket!");
       });
       task.catch((error) => {
-        console.log("Upload Product Catch", error);
+        console.log(TAG, "Upload Product Catch", error);
       });
     } catch (error) {
-      console.log("saveProduct", error);
+      console.log(TAG, "saveProduct", error);
       return null;
     }
   }

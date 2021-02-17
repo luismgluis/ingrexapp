@@ -5,8 +5,8 @@ import CButton from '../CButton/CButton';
 import CIcon from '../CIcon/CIcon';
 import Api from "./../../../libs/api/api";
 
-const PerfilHeader = (props) => {
-    console.log("perfilHeader", props);
+const PerfilHeader = ({ navigation, route, title = "", subtitle = "", description = "" }) => {
+    console.log("perfilHeader", navigation);
     const [avatarVisible, setAvatarVisible] = useState(false);
     const getPerfilImage = (withAvatar) => {
         if (withAvatar) {
@@ -20,11 +20,11 @@ const PerfilHeader = (props) => {
         }
     };
     const primaryBtnClick = () => {
-        const callBack = (data) => {
+        const callBackToUploadPost = (data) => {
             console.log("PerfilHeader - backdata", data);
-            props.navigation.navigate("CreatePost", { imageData: data });
+            navigation.navigate("CreatePost", { imageData: data });
         }
-        props.navigation.navigate("GalleryCustom", { callBack: callBack });
+        navigation.navigate("GalleryCustom", { callBack: callBackToUploadPost });
 
     }
     return (
@@ -38,12 +38,12 @@ const PerfilHeader = (props) => {
                 </Layout>
                 <Layout style={styles.panelRight}>
                     <Layout>
-                        <Text category="h5" >Fulano suntano</Text>
-                        <Text category="s2">Empresa Cocoa</Text>
+                        <Text category="h5" >{title}</Text>
+                        <Text category="s2">{subtitle}</Text>
                         <Divider />
                         <Text
                             style={styles.description}
-                            category="s1">Esta es una super empresa</Text>
+                            category="s1">{description}</Text>
                     </Layout>
                 </Layout>
             </Layout>

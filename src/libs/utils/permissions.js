@@ -1,5 +1,5 @@
 import { PermissionsAndroid } from "react-native";
-
+const TAG = "PERMISSIONS"
 const requestPermission = async (title, message, permissionName) => {
   try {
     const granted = await PermissionsAndroid.request(
@@ -13,13 +13,13 @@ const requestPermission = async (title, message, permissionName) => {
       }
     );
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use permission", permissionName);
+      console.log(TAG, "You can use permission", permissionName);
       return true
     }
-    console.log("permission denied", permissionName);
+    console.log(TAG, "permission denied", permissionName);
     return false
   } catch (err) {
-    console.warn("permission fail", err);
+    console.warn(TAG, "permission fail", err);
     return false
   }
 };
@@ -43,10 +43,10 @@ const requestWriteFilesPermission = async () => {
 const checkPermission = async (permission) => {
   try {
     const res = await PermissionsAndroid.check(permission);
-    console.log("Permission", permission, res);
+    console.log(TAG, "Permission", permission, res);
     return res;
   } catch (error) {
-    console.log("Check Permission Fail", error);
+    console.log(TAG, "Check Permission Fail", error);
     return null;
   }
 }

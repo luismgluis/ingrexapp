@@ -2,18 +2,19 @@ import { Button, Divider, Layout, Text } from '@ui-kitten/components';
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
 
+const TAG = "SALES SCREEN";
 class SalesScreen extends Component {
     handlePress() {
-        console.log('hola');
+        console.log(TAG, 'hola');
         try {
-            console.log(this.props.route?.params?.user);
+            console.log(TAG, this.props.route?.params?.user);
         } catch (error) {
-            console.log('fail');
+            console.log(TAG, 'fail');
 
         }
     };
     goToHome() {
-        console.log('home');
+        console.log(TAG, 'home');
     }
     render() {
         return (

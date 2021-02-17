@@ -2,11 +2,9 @@ import { Button, Divider, Layout, Text } from '@ui-kitten/components';
 import React, { Component } from 'react';
 class CreateUser extends Component {
     handlePress() {
-        console.log('hola');
         this.props.navigation.navigate('LoginScreen');
     };
     goToHome() {
-        console.log('pepe');
     }
     render() {
         return (

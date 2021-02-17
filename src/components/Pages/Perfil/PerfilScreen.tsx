@@ -1,0 +1,137 @@
+import { Layout } from "@ui-kitten/components";
+import React, { useEffect, useState, useCallback } from "react";
+import { StyleSheet, View } from "react-native";
+
+import FeedImages from "../../UI/FeedImages/FeedImages";
+import PerfilHeader from "../../UI/PerfilHeader/PerfilHeader";
+import SelectPerfil from "../../UI/SelectPerfil/SelectPerfil";
+import Api from "../../../libs/api/api";
+import Alert from "../../../libs/alert/alert";
+import { useSelector, useDispatch } from "react-redux";
+import * as actionsGeneral from "../../../actions/actionsGeneral";
+import { Business } from "../../../libs/api/interfaces";
+
+const TAG = "PERFIL SCREEN";
+const MySelectPerfil = () => {
+  const dispatch = useDispatch();
+
+  const action = (key: Business) => {
+    if (!(key instanceof Business)) {
+      console.log(TAG, "Key isn't a business instance");
+      return;
+    }
+    console.log(TAG, key);
+    dispatch(actionsGeneral.setCurrentBusiness(key));
+  };
+  const dropOptionsDefault = [
+    {
+      title: "Crear",
+      onPress: () => {
+        action(null);
+      },
+      iconName: "plus-outline",
+      systemOption: true,
+      active: false,
+    },
+  ];
+  const [dropOptions, setDropOptions] = useState([]);
+  const analiceAllBusiness = (data: Array<Business>) => {
+    const currentBusiness = Api.currentBusiness;
+    let replaceArray = [...dropOptionsDefault].slice();
+    for (const key in data) {
+      if (!Object.hasOwnProperty.call(data, key)) {
+        continue;
+      }
+      const business = data[key];
+      const active = business.id == currentBusiness.id;
+      const newItem = {
+        title: business.name.toUpperCase(),
+        onPress: () => {
+          action(business);
+        },
+        iconName: "briefcase-outline",
+        systemOption: false,
+        active: active,
+      };
+      replaceArray.unshift(newItem);
+    }
+    setDropOptions(replaceArray);
+  };
+  const getOptions = useCallback(() => {
+    console.log(TAG, "get options");
+    Api.getMyBusiness()
+      .then((data) => {
+        analiceAllBusiness(data);
+      })
+      .catch((error) => {
+        console.log(TAG, error);
+        Alert.show("Fail", "Can't get user business");
+      });
+  }, []);
+  useEffect(() => {
+    getOptions();
+  }, []);
+  return <SelectPerfil dropOptions={dropOptions} searchEnabledOrg={false} />;
+};
+
+const PerfilScreen = (props) => {
+  console.log(TAG, "perfilScreen");
+  const currentBusiness: Business = useSelector((store) => {
+    return store.generalApp.currentBusiness;
+  });
+  const name = currentBusiness.name;
+  const description = currentBusiness.description;
+  const atsing = `@${currentBusiness.at}`;
+  return (
+    <Layout style={styles.father}>
+      <Layout style={styles.panelOne}>
+        <MySelectPerfil />
+      </Layout>
+      <Layout style={styles.view0}>
+        <Layout style={styles.view1}>
+          <PerfilHeader
+            title={name}
+            subtitle={atsing}
+            description={description}
+            {...props}
+          />
+        </Layout>
+        <View style={styles.view2}>
+          <FeedImages arrayImages={[]} />
+        </View>
+      </Layout>
+    </Layout>
+  );
+};
+
+const styles = StyleSheet.create({
+  father: { flex: 12 },
+  view0: { flex: 12 },
+  view1: {
+    flex: 2,
+    backgroundColor: "#3366FF",
+  },
+  view2: {
+    flex: 4,
+    backgroundColor: "#7CD628",
+  },
+  container: {
+    flex: 12,
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+  panelOne: {
+    height: 50,
+    backgroundColor: "red",
+  },
+  panelTwo: {
+    flex: 4,
+    flexDirection: "row",
+  },
+  panelThree: {
+    flex: 8,
+    flexDirection: "row",
+  },
+});
+
+export default PerfilScreen;
