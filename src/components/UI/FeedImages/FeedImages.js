@@ -1,6 +1,6 @@
 import { Layout, Text } from "@ui-kitten/components";
 import React, { useState } from "react";
-import { Dimensions, FlatList, Image, StyleSheet, View } from "react-native";
+import { Dimensions, Pressable, FlatList, Image, StyleSheet, View } from "react-native";
 import { color } from "react-native-reanimated";
 import Utils from "./../../../libs/utils/utils";
 import SelectPerfil from "./../SelectPerfil/SelectPerfil";
@@ -8,6 +8,7 @@ import SelectPerfil from "./../SelectPerfil/SelectPerfil";
 const win = Dimensions.get("window");
 let items = [];
 let itemsO = [];
+let imagePressFn = () => { };
 
 function initializeData() {
   let actualbox = [];
@@ -55,26 +56,29 @@ const renderBox = (data) => {
   }
   const theKey = Utils.generateKey(`feedimages${data.key}`);
   return (
-    <View key={theKey} style={styles.box}>
-      <Image style={styles.boxImage} source={{ uri: data.uri }} ></Image>
-      <Text category="s1" key={`t_${theKey}`} style={styles.boxTitle}>
-        {data.name}
-      </Text>
-    </View>
+    <Pressable onPress={() => { imagePressFn(data) }}>
+      <View key={theKey} style={styles.box}>
+        <Image style={styles.boxImage} source={{ uri: data.uri }} ></Image>
+        <Text category="s1" key={`t_${theKey}`} style={styles.boxTitle}>
+          {data.name}
+        </Text>
+      </View>
+    </Pressable>
   );
 };
 const renderItem = ({ item }) => {
   return renderBox(item);
 };
 
-const FeedImages = ({ arrayImages }) => {
+const FeedImages = ({ arrayImages, onPress = () => { } }) => {
   itemsO = Array.isArray(arrayImages) ? arrayImages : [];
   itemsO = initialParseData(itemsO);
+  imagePressFn = onPress;
   console.log("itemsO");
   return (
     <Layout style={styles.container}>
       <View style={styles.view1}>
-        <SelectPerfil />
+        <SelectPerfil searchEnabledOrg={true} />
       </View>
       <View style={styles.view2}>
         <FlatList

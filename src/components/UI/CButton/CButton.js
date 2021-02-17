@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Icon } from '@ui-kitten/components';
 import { StyleSheet, View } from 'react-native';
 
-const CButton = ({ styles = {}, icon, type, type2, textButton = "" }) => {
+const CButton = ({ styles = {}, icon, type, type2, textButton = "", onPress = () => { } }) => {
     function MyIcon(icon) {
         return (props) => (
             <Icon {...props} name={icon} />//'star' />
@@ -26,6 +26,7 @@ const CButton = ({ styles = {}, icon, type, type2, textButton = "" }) => {
     return (
         <View style={{ ...Ostyles.container, ...stylesv }}>
             <Button style={Ostyles.button}
+                onPress={onPress}
                 status={thetype}
                 accessoryLeft={MyIcon(icon)}>
                 {textButton}

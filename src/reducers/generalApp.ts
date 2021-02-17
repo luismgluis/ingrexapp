@@ -3,7 +3,7 @@ interface TheInitialState {
   currentBusiness: Business;
 }
 const INITIAL_STATE: TheInitialState = {
-  currentBusiness: null,
+  currentBusiness: new Business(),
 };
 
 export default (state = INITIAL_STATE, action: any) => {

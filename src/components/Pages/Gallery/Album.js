@@ -6,8 +6,7 @@ import Utils from "./../../../libs/utils/utils";
 import FeedImages from "../../UI/FeedImages/FeedImages";
 import CTopBack from "./../../UI/CTopBack/CTopBack";
 
-const Album = ({ navigation, route }) => {
-
+const Album = ({ navigation, route, callBack = () => { } }) => {
   const [dataImages, setDataImages] = useState([]);
 
   const defaultProps = {
@@ -85,7 +84,7 @@ const Album = ({ navigation, route }) => {
   return (
     <Layout style={styles.container}>
       <CTopBack onBackPress={navigation.goBack} title={"Select an image"} />
-      <FeedImages arrayImages={dataImages} />
+      <FeedImages onPress={callBack} arrayImages={dataImages} />
     </Layout>
   );
 };

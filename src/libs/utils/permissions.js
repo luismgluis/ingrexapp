@@ -40,8 +40,26 @@ const requestWriteFilesPermission = async () => {
     "WRITE_EXTERNAL_STORAGE")
 };
 
+const checkPermission = async (permission) => {
+  try {
+    const res = await PermissionsAndroid.check(permission);
+    console.log("Permission", permission, res);
+    return res;
+  } catch (error) {
+    console.log("Check Permission Fail", error);
+    return null;
+  }
+}
+const permissionsTypes = {
+  CAMERA: PermissionsAndroid.PERMISSIONS.CAMERA,
+  READ: PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+  WRITE: PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+}
+
 export default {
   requestCameraPermission,
   requestReadFilesPermission,
-  requestWriteFilesPermission
+  requestWriteFilesPermission,
+  checkPermission,
+  permissionsTypes
 }

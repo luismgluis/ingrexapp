@@ -5,12 +5,17 @@ class business {
   crator: string;
   description: string;
   name: string;
-  constructor(id: string, data: any) {
+  constructor(id: string = "", data: any = {}) {
     this.id = id;
     this.admins = data.admins || [];
     this.createDate = data.createDate?.seconds || data.createDate || 0;
     this.description = data.description || "";
     this.name = data.name || "";
+  }
+  isEmpty() {
+    if (this.id !== "") {
+      return true;
+    }
   }
 }
 

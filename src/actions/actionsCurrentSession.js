@@ -11,16 +11,19 @@ export const traerTodos = () => async (dispatch) => {
   });
 };
 
-export const loginWithEmail = (user, password, callBackFail = null) => async (dispatch) => {
-  console.log("login with ", user);
+export const loginWithEmail = (user, password, callBack = null) => async (dispatch) => {
   auth() //'grajales805@gmail.com', 'elpepe'
     .signInWithEmailAndPassword(user, password)
     .then(() => {
       console.log("User signed in!");
+      const me = auth().currentUser;
       dispatch({
         type: "loginWithEmail",
-        payload: "loged",
+        payload: me,
       });
+      if (callBack !== null) {
+        callBack(true);
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -33,9 +36,8 @@ export const loginWithEmail = (user, password, callBackFail = null) => async (di
         console.log("That email address is invalid!");
       }
 
-      console.error(error);
-      if (callBackFail !== null) {
-        callBackFail(false);
+      if (callBack !== null) {
+        callBack(false);
       }
     });
 };

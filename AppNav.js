@@ -7,9 +7,13 @@ import { useSelector, useDispatch } from "react-redux";
 import HomeStack from "./src/components/Pages/Home/HomeStack";
 import LoginStack from "./src/components/Pages/Login/LoginStack";
 import Gallery from "./src/components/Pages/Gallery/GalleryStack";
+import Post from "./src/components/Pages/Post/Post";
 
 import * as sessionActions from "./src/actions/actionsCurrentSession";
 import auth from "@react-native-firebase/auth";
+import Api from "./src/libs/api/api";
+
+
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -19,9 +23,10 @@ const AppNav = () => {
   const myuser = useSelector((store) => {
     return store.currentSession.user;
   });
-  const currenBusiness = useSelector((store) => {
+  const currentBusiness = useSelector((store) => {
     return store.generalApp.currentBusiness;
   });
+  Api.setCurrentBusiness(currentBusiness);
 
   const authChange = useCallback(() => {
     auth().onAuthStateChanged((data) => {
@@ -33,8 +38,7 @@ const AppNav = () => {
     authChange();
   }, []);
 
-  const getScreen = () => {
-    console.log("getscreen");
+  const getInitialScreen = () => {
     if (typeof myuser?.uid !== "undefined") {
       if (myuser.uid !== "") {
         return <Screen name="HomeStack" component={HomeStack} />;
@@ -48,8 +52,9 @@ const AppNav = () => {
       headerMode="none"
       initialRouteName="LoginStack"
       screenOptions={{ headerShown: false }}>
-      {getScreen()}
+      {getInitialScreen()}
       <Screen name="GalleryCustom" component={Gallery} />
+      <Screen name="CreatePost" component={Post} />
     </Navigator>
   );
 

@@ -1,11 +1,12 @@
-'use strict'
 import { Avatar, Divider, Layout, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import CButton from '../CButton/CButton';
 import CIcon from '../CIcon/CIcon';
+import Api from "./../../../libs/api/api";
 
-const PerfilHeader = () => {
+const PerfilHeader = (props) => {
+    console.log("perfilHeader", props);
     const [avatarVisible, setAvatarVisible] = useState(false);
     const getPerfilImage = (withAvatar) => {
         if (withAvatar) {
@@ -18,7 +19,14 @@ const PerfilHeader = () => {
             return (<CIcon style={styles.avatar} />)
         }
     };
+    const primaryBtnClick = () => {
+        const callBack = (data) => {
+            console.log("PerfilHeader - backdata", data);
+            props.navigation.navigate("CreatePost", { imageData: data });
+        }
+        props.navigation.navigate("GalleryCustom", { callBack: callBack });
 
+    }
     return (
         <Layout style={styles.container} level="1">
             <Layout style={styles.containerTop}>
@@ -42,6 +50,7 @@ const PerfilHeader = () => {
             <Layout style={styles.containerBottom}>
                 <Layout style={styles.panelActions}>
                     <CButton icon={"plus-outline"}
+                        onPress={primaryBtnClick}
                         type="primary" textButton="Product" />
                     <CButton icon={"plus-outline"} textButton="Product" />
                     <CButton icon={"activity-outline"} />

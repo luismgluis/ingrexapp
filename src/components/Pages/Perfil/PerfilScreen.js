@@ -63,7 +63,7 @@ const MySelectPerfil = () => {
       searchEnabled={false} />
   )
 }
-const PerfilScreen = () => {
+const PerfilScreen = (props) => {
 
   return (
     <View style={styles.father}>
@@ -72,7 +72,7 @@ const PerfilScreen = () => {
       </Layout>
       <View style={styles.view0}>
         <View style={styles.view1}>
-          <PerfilHeader />
+          <PerfilHeader {...props} />
         </View>
         <View style={styles.view2}>
           <FeedImages />
