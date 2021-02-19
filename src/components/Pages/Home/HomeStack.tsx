@@ -6,12 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import api from "../../../libs/api/api";
 import * as actionsGeneral from "../../../actions/actionsGeneral";
 import { Business } from "../../../libs/api/interfaces";
+import utils from "../../../libs/utils/utils";
 
+const navigatorBaseKey = utils.generateKey("HomeScreen");
 const { Navigator, Screen } = createStackNavigator();
 const TAG = "HOME STACK";
 const HomeStack = () => {
   const dispatch = useDispatch();
-  const [ready, setReady] = useState(false);
+
   const currentBusiness: Business = useSelector((store) => {
     return store.generalApp.currentBusiness;
   });
@@ -24,8 +26,13 @@ const HomeStack = () => {
       }
     });
   }, []);
+  const keyNav = `${navigatorBaseKey}_${currentBusiness.id}`;
+
   return (
-    <Navigator headerMode="none" screenOptions={{ headerShown: false }}>
+    <Navigator
+      key={keyNav}
+      headerMode="none"
+      screenOptions={{ headerShown: false }}>
       {!currentBusiness.isEmpty() && (
         <Screen name="HomeScreen" component={HomeScreen} />
       )}

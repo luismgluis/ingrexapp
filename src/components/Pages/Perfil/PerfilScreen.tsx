@@ -9,7 +9,9 @@ import Api from "../../../libs/api/api";
 import Alert from "../../../libs/alert/alert";
 import { useSelector, useDispatch } from "react-redux";
 import * as actionsGeneral from "../../../actions/actionsGeneral";
-import { Business } from "../../../libs/api/interfaces";
+import { Business, Product } from "../../../libs/api/interfaces";
+import { FeedImageType } from "./../../../components/UI/FeedImages/FeedImages";
+import { call } from "react-native-reanimated";
 
 const TAG = "PERFIL SCREEN";
 const MySelectPerfil = () => {
@@ -76,9 +78,42 @@ const MySelectPerfil = () => {
 
 const PerfilScreen = (props) => {
   console.log(TAG, "perfilScreen");
+  const [imagesArray, setImagesArray] = useState<Array<FeedImageType>>([]);
   const currentBusiness: Business = useSelector((store) => {
     return store.generalApp.currentBusiness;
   });
+
+  useEffect(() => {
+    // mounted
+    console.log(TAG, "mounted");
+    Api.getProductsByBusiness().then((products) => {
+      let newImages = Array<FeedImageType>();
+      function analiceProduct(prod: Product) {
+        const newItem: FeedImageType = {
+          key: `${newImages.length + 1}`,
+          uri: "", //prod.urlImg,
+          title: prod.name,
+          timeStamp: prod.timeStamp,
+          update: (callback: any) => {
+            const newp = Object.assign({}, newItem);
+            newp.uri =
+              "file:///storage/emulated/0/Download/PHOTO_20200618_175433-01.jpg";
+            callback(newp);
+          },
+          onPress: () => {},
+        };
+        newImages.push(newItem);
+      }
+      for (const key in products) {
+        if (!Object.prototype.hasOwnProperty.call(products, key)) {
+          continue;
+        }
+        const element = products[key];
+        analiceProduct(element);
+      }
+      setImagesArray(newImages);
+    });
+  }, []);
   const name = currentBusiness.name;
   const description = currentBusiness.description;
   const atsing = `@${currentBusiness.at}`;
@@ -97,7 +132,7 @@ const PerfilScreen = (props) => {
           />
         </Layout>
         <View style={styles.view2}>
-          <FeedImages arrayImages={[]} />
+          <FeedImages arrayImages={imagesArray} />
         </View>
       </Layout>
     </Layout>

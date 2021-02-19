@@ -4,12 +4,14 @@ class product {
   urlImg: string;
   business: string;
   description: string;
+  timeStamp: number;
   constructor(id: string = "", data: any = {}) {
     this.id = id;
     this.name = data.name || "";
     this.description = data.description || "";
     this.urlImg = data.urlImg || "";
     this.business = data.business || "";
+    this.timeStamp = data.timeStamp || 0;
   }
   create(name = "", description = "") {
     this.name = name;

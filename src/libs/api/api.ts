@@ -2,6 +2,7 @@ import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { User, Business, Product } from "./interfaces";
+import { reject } from "core-js/fn/promise";
 const TAG = "API";
 class Api {
   static instance: any;
@@ -70,46 +71,78 @@ class Api {
     }
     this.currentBusiness = business;
   }
+  async getProductsByBusiness(businessId = ""): Promise<Array<Product>> {
+    if (businessId == "") {
+      businessId = this.currentBusiness.id;
+    }
+    const myCollection = firestore().collection("products");
+    const resultProducts = await myCollection
+      .where("business", "==", businessId)
+      .get();
+    let allProducts = Array<Product>();
+    resultProducts.forEach((doc) => {
+      allProducts.push(new Product(doc.id, doc.data()));
+    });
+    return allProducts;
+  }
   async getMyInfo() {
     await this.checkDefaults();
     return await this.getUserInfo(this.myuser.uid);
   }
-  async saveProduct(newProd: Product, imageUri: string = "") {
-    try {
-      if (typeof newProd == "undefined") {
-        return null;
+  async saveProduct(
+    newProd: Product,
+    imageUri: string = "",
+    callBackProgress: Function,
+  ) {
+    console.log(TAG, "saveproduct");
+
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const businessId = this.currentBusiness.id;
+        if (!(newProd instanceof Product)) {
+          reject("newProd isn't an instance of Product");
+        }
+        if (newProd.isEmpty()) {
+          console.log(TAG, "SaveProduct is empty");
+          reject("newProd is empty");
+        }
+
+        const myCollection = firestore().collection("products");
+        const resultNewProduct = await myCollection.add(newProd);
+
+        if (newProd.timeStamp == 0) {
+          const timestamp = firestore.FieldValue.serverTimestamp();
+          resultNewProduct.update({ timeStamp: timestamp });
+        }
+
+        console.log(TAG, "saveProduct Add", resultNewProduct);
+
+        const pathStorageFile = `business/${businessId}/products/${resultNewProduct.id}`;
+        const reference = storage().ref(pathStorageFile);
+        const task = reference.putFile(imageUri);
+
+        task.on("state_changed", (taskSnapshot) => {
+          console.log(
+            TAG,
+            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+          );
+          callBackProgress(taskSnapshot.bytesTransferred);
+        });
+
+        task.then(() => {
+          console.log(TAG, "Image uploaded to the bucket!");
+          resolve(true);
+        });
+        task.catch((error) => {
+          console.log(TAG, "Upload Product Catch", error);
+          resultNewProduct.delete();
+          reject("Upload image failed");
+        });
+      } catch (error) {
+        console.log(TAG, "saveProduct", error);
+        reject("Upload image process failed");
       }
-      if (newProd.isEmpty()) {
-        console.log(TAG, "SaveProduct is empty");
-        return null;
-      }
-      console.log(TAG, "saveproduct");
-      const myCollection = firestore().collection("products");
-      const result = await myCollection.add(newProd);
-      console.log(TAG, "saveProduct Add", result);
-      if (typeof result.id == "undefined") {
-        return null;
-      }
-      //this.currentBusiness.id ----------▼
-      const pathStorageFile = `business/${"gg"}/products/${result.id}`;
-      const reference = storage().ref(pathStorageFile);
-      const task = reference.putFile(imageUri);
-      task.on("state_changed", (taskSnapshot) => {
-        console.log(
-          TAG,
-          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-        );
-      });
-      task.then(() => {
-        console.log(TAG, "Image uploaded to the bucket!");
-      });
-      task.catch((error) => {
-        console.log(TAG, "Upload Product Catch", error);
-      });
-    } catch (error) {
-      console.log(TAG, "saveProduct", error);
-      return null;
-    }
+    });
   }
 }
 export default new Api();

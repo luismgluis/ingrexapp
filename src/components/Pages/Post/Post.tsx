@@ -6,6 +6,7 @@ import CButton from "../../UI/CButton/CButton";
 import Api from "../../../libs/api/api";
 import alert from "../../../libs/alert/alert";
 import { Business, Product } from "../../../libs/api/interfaces";
+import ImageResizer from "react-native-image-resizer";
 
 const win = Dimensions.get("window");
 const TAG = "CREATE POST";
@@ -43,11 +44,30 @@ const Post = ({
       alert.show("Need an image");
       return;
     }
-    Api.saveProduct(newBusiness, imgUri).then((res) => {
-      if (res) {
-        navigation.goBack();
-      }
-    });
+
+    ImageResizer.createResizedImage(imgUri, 600, 600, "JPEG", 100, 0)
+      .then((response) => {
+        // response.uri is the URI of the new image that can now be displayed, uploaded...
+        // response.path is the path of the new image
+        // response.name is the name of the new image with the extension
+        // response.size is the size of the new image
+        const progressFn = (progress: number) => {
+          console.log(TAG, progress);
+        };
+
+        Api.saveProduct(newBusiness, response.uri, progressFn).then((res) => {
+          if (res) {
+            alert.show("Upload Success");
+            navigation.goBack();
+            return;
+          }
+          alert.show("Upload failed", "try again");
+        });
+      })
+      .catch((err) => {
+        // Oops, something went wrong. Check that the filename is correct and
+        // inspect err to get more details.
+      });
   };
 
   return (

@@ -1,14 +1,22 @@
 import { Layout, Text } from "@ui-kitten/components";
-import React, { useState } from "react";
-import { Dimensions, Pressable, FlatList, Image, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Dimensions,
+  Pressable,
+  FlatList,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import { color } from "react-native-reanimated";
-import Utils from "./../../../libs/utils/utils";
-import SelectPerfil from "./../SelectPerfil/SelectPerfil";
+import Utils from "../../../libs/utils/utils";
+import SelectPerfil from "../SelectPerfil/SelectPerfil";
+
+const TAG = "FEED IMAGES";
 
 const win = Dimensions.get("window");
 let items = [];
 let itemsO = [];
-let imagePressFn = () => { };
 
 function initializeData() {
   let actualbox = [];
@@ -50,30 +58,42 @@ function initialParseData(data) {
   }
   return dataResult;
 }
-const renderBox = (data) => {
-  if (typeof data.uri == "undefined") {
-    return <></>
-  }
+
+const RenderItem = ({ item }) => {
+  const datao: FeedImageType = item;
+  const [data, setData] = useState(datao);
   const theKey = Utils.generateKey(`feedimages${data.key}`);
+  if (typeof data.uri == "undefined") {
+    return <></>;
+  }
+
+  useEffect(() => {
+    data.update((result: FeedImageType) => {
+      if (result !== null) {
+        console.log(TAG, "--UPDATEEE--", result);
+        setData(result);
+      }
+    });
+  }, []);
+
   return (
-    <Pressable onPress={() => { imagePressFn(data) }}>
+    <Pressable
+      onPress={() => {
+        data.onPress(data);
+      }}>
       <View key={theKey} style={styles.box}>
-        <Image style={styles.boxImage} source={{ uri: data.uri }} ></Image>
+        <Image style={styles.boxImage} source={{ uri: data.uri }}></Image>
         <Text category="s1" key={`t_${theKey}`} style={styles.boxTitle}>
-          {data.name}
+          {data.title}
         </Text>
       </View>
     </Pressable>
   );
 };
-const renderItem = ({ item }) => {
-  return renderBox(item);
-};
-
-const FeedImages = ({ arrayImages, onPress = () => { } }) => {
-  itemsO = Array.isArray(arrayImages) ? arrayImages : [];
-  itemsO = initialParseData(itemsO);
-  imagePressFn = onPress;
+interface FeedProps {
+  arrayImages: Array<FeedImageType>;
+}
+const FeedImages = ({ arrayImages }: FeedProps) => {
   console.log("itemsO");
   return (
     <Layout style={styles.container}>
@@ -85,8 +105,8 @@ const FeedImages = ({ arrayImages, onPress = () => { } }) => {
           contentContainerStyle={{ margin: 4 }}
           horizontal={false}
           numColumns={3}
-          data={itemsO}
-          renderItem={renderItem}
+          data={arrayImages}
+          renderItem={({ item }) => <RenderItem item={item} />}
           keyExtractor={(item) => item.key}
         />
       </View>
@@ -104,12 +124,12 @@ const styles = StyleSheet.create({
   content: { flex: 12 },
   box: {
     backgroundColor: "gray",
-    width: (win.width / 3) - marginXbox - (2),
-    height: (win.width / 3),
+    width: win.width / 3 - marginXbox - 2,
+    height: win.width / 3,
     borderRadius: 4,
     overflow: "hidden",
     marginTop: marginXbox,
-    marginRight: marginXbox
+    marginRight: marginXbox,
   },
   boxImage: {
     flex: 1,
@@ -123,6 +143,15 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#0000005e",
     paddingHorizontal: 5,
-  }
+  },
 });
 export default FeedImages;
+
+export interface FeedImageType {
+  key: string;
+  uri: string;
+  title: string;
+  timeStamp: number;
+  update: Function;
+  onPress: Function;
+}
