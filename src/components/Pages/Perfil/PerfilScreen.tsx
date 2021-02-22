@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 import FeedImages from "../../UI/FeedImages/FeedImages";
 import PerfilHeader from "../../UI/PerfilHeader/PerfilHeader";
 import SelectPerfil from "../../UI/SelectPerfil/SelectPerfil";
-import Api from "../../../libs/api/api";
+import api from "../../../libs/api/api";
 import Alert from "../../../libs/alert/alert";
 import { useSelector, useDispatch } from "react-redux";
 import * as actionsGeneral from "../../../actions/actionsGeneral";
@@ -37,8 +37,8 @@ const MySelectPerfil = () => {
     },
   ];
   const [dropOptions, setDropOptions] = useState([]);
-  const analiceAllBusiness = (data: Array<Business>) => {
-    const currentBusiness = Api.currentBusiness;
+  const analizeAllBusiness = (data: Array<Business>) => {
+    const currentBusiness = api.currentBusiness;
     let replaceArray = [...dropOptionsDefault].slice();
     for (const key in data) {
       if (!Object.hasOwnProperty.call(data, key)) {
@@ -61,9 +61,10 @@ const MySelectPerfil = () => {
   };
   const getOptions = useCallback(() => {
     console.log(TAG, "get options");
-    Api.getMyBusiness()
+    api
+      .getMyBusiness()
       .then((data) => {
-        analiceAllBusiness(data);
+        analizeAllBusiness(data);
       })
       .catch((error) => {
         console.log(TAG, error);
@@ -86,9 +87,11 @@ const PerfilScreen = (props) => {
   useEffect(() => {
     // mounted
     console.log(TAG, "mounted");
-    Api.getProductsByBusiness().then((products) => {
+    const obprod = api.getProductsByBusinessEvent();
+    obprod.onUpdate((products) => {
       let newImages = Array<FeedImageType>();
-      function analiceProduct(prod: Product) {
+
+      function analizeProduct(prod: Product) {
         const newItem: FeedImageType = {
           key: `${newImages.length + 1}`,
           uri: "", //prod.urlImg,
@@ -96,23 +99,37 @@ const PerfilScreen = (props) => {
           timeStamp: prod.timeStamp,
           update: (callback: any) => {
             const newp = Object.assign({}, newItem);
-            newp.uri =
-              "file:///storage/emulated/0/Download/PHOTO_20200618_175433-01.jpg";
-            callback(newp);
+            api
+              .getProductImage(currentBusiness.id, prod.id)
+              .then((uri) => {
+                newp.uri = uri;
+                //"file:///storage/emulated/0/Download/PHOTO_20200618_175433-01.jpg";
+                callback(newp);
+              })
+              .catch((err) => {
+                console.log(TAG, "Get Product Fail", err);
+              });
           },
           onPress: () => {},
         };
+
         newImages.push(newItem);
       }
+
       for (const key in products) {
         if (!Object.prototype.hasOwnProperty.call(products, key)) {
           continue;
         }
         const element = products[key];
-        analiceProduct(element);
+        analizeProduct(element);
       }
+
       setImagesArray(newImages);
     });
+    return () => {
+      obprod.unSubcriber();
+    };
+    //api.getProductsByBusiness().then((products) => {});
   }, []);
   const name = currentBusiness.name;
   const description = currentBusiness.description;

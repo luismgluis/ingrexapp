@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import { Dimensions, StyleSheet, Image, Button } from "react-native";
 import CTopBack from "../../UI/CTopBack/CTopBack";
 import CButton from "../../UI/CButton/CButton";
-import Api from "../../../libs/api/api";
+import api from "../../../libs/api/api";
 import alert from "../../../libs/alert/alert";
 import { Business, Product } from "../../../libs/api/interfaces";
 import ImageResizer from "react-native-image-resizer";
+import { FeedImageType } from "../../UI/FeedImages/FeedImages";
 
 const win = Dimensions.get("window");
 const TAG = "CREATE POST";
@@ -17,7 +18,7 @@ const Post = ({
   imgUri = "file:///storage/emulated/0/Download/PHOTO_20200618_175433-01.jpg",
 }) => {
   try {
-    const imageData = route.params.imageData;
+    const imageData: FeedImageType = route.params.imageData;
     if (typeof imageData.uri !== "undefined") {
       imgUri = imageData.uri;
     }
@@ -34,7 +35,7 @@ const Post = ({
     console.log(TAG, "onpressss", navigation, route);
 
     const newBusiness = new Product();
-    newBusiness.create(name, description);
+    newBusiness.create(api.currentBusiness.id, name, description);
 
     if (name == "") {
       alert.show("Need a name");
@@ -55,7 +56,7 @@ const Post = ({
           console.log(TAG, progress);
         };
 
-        Api.saveProduct(newBusiness, response.uri, progressFn).then((res) => {
+        api.saveProduct(newBusiness, response.uri, progressFn).then((res) => {
           if (res) {
             alert.show("Upload Success");
             navigation.goBack();

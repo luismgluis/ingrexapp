@@ -15,49 +15,6 @@ import SelectPerfil from "../SelectPerfil/SelectPerfil";
 const TAG = "FEED IMAGES";
 
 const win = Dimensions.get("window");
-let items = [];
-let itemsO = [];
-
-function initializeData() {
-  let actualbox = [];
-  for (let index = 0; index < 200; index++) {
-    const theitem = {
-      key: Utils.generateKey(`Feedkey${index}`),
-      name: `box${index}`,
-    };
-    itemsO.push(theitem);
-    actualbox.push(theitem);
-    if (actualbox.length == 2) {
-      items.push(actualbox);
-      actualbox = [];
-      continue;
-    }
-  }
-  if (actualbox.length > 0) {
-    items.push(actualbox);
-    actualbox = [];
-  }
-}
-initializeData();
-function initialParseData(data) {
-  let dataResult = [];
-  for (const key in data) {
-    if (!Object.hasOwnProperty.call(data, key)) {
-      continue;
-    }
-    const element = data[key];
-    element.key = key;
-    element.date = "";
-    if (typeof element.timestamp !== "undefined") {
-      element.name = Utils.dates.unixToString(element.timestamp, true);
-    }
-    if (typeof element.name == "undefined") {
-      element.name = `item${key}`;
-    }
-    dataResult.push(element);
-  }
-  return dataResult;
-}
 
 const RenderItem = ({ item }) => {
   const datao: FeedImageType = item;
