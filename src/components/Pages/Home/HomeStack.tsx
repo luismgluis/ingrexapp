@@ -7,38 +7,91 @@ import api from "../../../libs/api/api";
 import * as actionsGeneral from "../../../actions/actionsGeneral";
 import { Business } from "../../../libs/api/interfaces";
 import utils from "../../../libs/utils/utils";
+import { NavigationActions, StackActions } from "react-navigation";
+import { CommonActions, NavigationState } from "@react-navigation/native";
+
+let lastCurrentBusinessId = "";
+const cleanRoutes = (navigation, actualBusinessId = "") => {
+  if (
+    lastCurrentBusinessId !== "" &&
+    actualBusinessId !== lastCurrentBusinessId
+  ) {
+    setTimeout(() => {
+      lastCurrentBusinessId = "";
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{ name: "HomeStack" }],
+        }),
+      );
+    }, 100);
+  }
+};
+
+const getScreens = (currentBusiness: string) => {
+  const McurrentBusiness = "s";
+  lastCurrentBusinessId = currentBusiness;
+  if (currentBusiness == "") {
+    return (
+      <Screen
+        key={"LoadingPanel" + McurrentBusiness}
+        name={"LoadingPanelHomeStack" + McurrentBusiness}
+        component={LoadingPanel}
+      />
+    );
+  }
+  return (
+    <Screen
+      key={"HomeScreenV" + McurrentBusiness}
+      name={"HomeScreen" + McurrentBusiness}
+      component={HomeScreen}
+    />
+  );
+};
 
 const navigatorBaseKey = utils.generateKey("HomeScreen");
 const { Navigator, Screen } = createStackNavigator();
+
 const TAG = "HOME STACK";
-const HomeStack = () => {
+
+const HomeStack = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
-  const currentBusiness: Business = useSelector((store) => {
+  const currentBusiness = useSelector((store) => {
     return store.generalApp.currentBusiness;
   });
+
+  console.log(TAG, "navigation", navigation);
+
+  cleanRoutes(navigation, currentBusiness.id);
+
+  console.log(TAG, currentBusiness);
+  const currentBusinessId: string = currentBusiness.id;
+  /* */
   console.log(TAG, currentBusiness);
   useEffect(() => {
     api.getMyBusiness().then((result) => {
       console.log(TAG, result);
       if (result.length > 0) {
-        dispatch(actionsGeneral.setCurrentBusiness(result[0]));
+        if (api.currentBusiness.isEmpty()) {
+          const firstBusiness = result[0];
+          api.setCurrentBusiness(firstBusiness);
+          dispatch(actionsGeneral.setCurrentBusiness(firstBusiness));
+        }
       }
     });
   }, []);
-  const keyNav = `${navigatorBaseKey}_${currentBusiness.id}`;
 
+  //const ss = utils.generateKey("s");
+
+  const keyNav = `${navigatorBaseKey}`; //_${currentBusinessId}`;
+  console.log(TAG, currentBusiness);
   return (
     <Navigator
       key={keyNav}
       headerMode="none"
       screenOptions={{ headerShown: false }}>
-      {!currentBusiness.isEmpty() && (
-        <Screen name="HomeScreen" component={HomeScreen} />
-      )}
-      {currentBusiness.isEmpty() && (
-        <Screen name="LoadingPanelHomeStack" component={LoadingPanel} />
-      )}
+      {getScreens(currentBusinessId)}
     </Navigator>
   );
 };

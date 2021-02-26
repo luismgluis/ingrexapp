@@ -63,8 +63,9 @@ class Api {
       const theBusiness = await this.getBusinessByArrIds(this.myinfo.business);
       this.allBusiness = theBusiness;
     }
+    console.log(TAG, this.allBusiness);
     if (this.currentBusiness.isEmpty()) {
-      this.currentBusiness = this.allBusiness[0];
+      //this.currentBusiness = this.allBusiness[0];
     }
     return this.allBusiness;
   }

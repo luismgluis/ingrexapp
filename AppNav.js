@@ -12,12 +12,12 @@ import Post from "./src/components/Pages/Post/Post";
 import * as sessionActions from "./src/actions/actionsCurrentSession";
 import auth from "@react-native-firebase/auth";
 import Api from "./src/libs/api/api";
-
+const TAG = "APP NAV";
 const { Navigator, Screen } = createStackNavigator();
 
 const AppNav = () => {
   const dispatch = useDispatch();
-
+  console.log(TAG, "AppNav Render");
   const myuser = useSelector((store) => {
     return store.currentSession.user;
   });

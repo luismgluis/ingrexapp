@@ -25,10 +25,13 @@ const renderIcon = (action) => {
   );
 };
 
-const CSearch = () => {
-  const [inputEnabled, setInputEnabled] = useState(false);
+const CSearch = ({ withCollapse = true }) => {
+  const [inputEnabled, setInputEnabled] = useState(!withCollapse);
   const [inputText, setInputText] = useState("");
   const toggleInputEnabled = () => {
+    if (!withCollapse) {
+      return;
+    }
     setInputEnabled(!inputEnabled);
   }; //
   const LayoutInputEnabled = (

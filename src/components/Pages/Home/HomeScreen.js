@@ -5,12 +5,11 @@ import {
   Icon,
   Layout,
 } from "@ui-kitten/components";
-import React from "react";
-import { StyleSheet } from "react-native";
-import { Text } from "react-native-svg";
+import React, { useEffect, useState } from "react";
 import AppConfig from "../../../libs/config/AppConfig";
 import Utils from "../../../libs/utils/utils";
 import PerfilScreen from "../Perfil/PerfilScreen";
+import SalesScreen from "../Sales/SalesScreen";
 const { Navigator, Screen } = createBottomTabNavigator();
 
 const TAG = "HOMESCREEN";
@@ -19,14 +18,14 @@ const pages = {
   stats: {
     title: AppConfig.TextFields.pages.home.stats,
     screenName: AppConfig.TextFields.pages.home.stats,
-    component: PerfilScreen,
+    component: SalesScreen,
     iconName: "star",
   },
   sales: {
     title: AppConfig.TextFields.pages.home.sales,
     screenName: AppConfig.TextFields.pages.home.sales,
-    component: PerfilScreen,
-    iconName: "star",
+    component: SalesScreen,
+    iconName: "shopping-cart",
   },
   perfil: {
     title: AppConfig.TextFields.pages.home.perfil,
@@ -36,58 +35,62 @@ const pages = {
   },
 };
 
-let screens = [];
-let tabs = [];
-
-function initilializeTabsScreens() {
-  for (const key in pages) {
-    if (!Object.hasOwnProperty.call(pages, key)) {
-      continue;
-    }
-    const page = pages[key];
-    screens.push(
-      <Screen
-        name={Utils.generateKey(page.screenName + key)}
-        key={Utils.generateKey(key)}
-        component={page.component}
-      />,
-    );
-    tabs.push(
-      <BottomNavigationTab
-        title={page.title}
-        key={Utils.generateKey(key)}
-        icon={getIcon(page.iconName)}
-      />,
-    );
-    console.log(TAG, "creating tabs");
-  }
-}
-initilializeTabsScreens();
 
 function getIcon(iconName = "star") {
   return (props) => <Icon {...props} name={iconName} />;
 }
 
 const BottomTabBar = ({ navigation, state }) => {
+  const [visibleTitles, setVisibleTitles] = useState(false);
+
+  const onSelectScreen = (index) => {
+
+    setVisibleTitles(true)
+    setTimeout(() => {
+      setVisibleTitles(false)
+    }, 3000);
+
+    navigation.navigate(state.routeNames[index]);
+  }
   return (
     <BottomNavigation
+      style={{ maxHeight: visibleTitles ? 60 : 35 }}
       selectedIndex={state.index}
-      onSelect={(index) => navigation.navigate(state.routeNames[index])}>
-      {tabs}
+      onSelect={onSelectScreen}>
+      <BottomNavigationTab
+        title={visibleTitles ? pages.stats.screenName : ""}
+        icon={getIcon(pages.stats.iconName)}
+      />
+      <BottomNavigationTab
+        title={visibleTitles ? pages.sales.screenName : ""}
+        icon={getIcon(pages.sales.iconName)}
+      />
+      <BottomNavigationTab
+        title={visibleTitles ? pages.perfil.screenName : ""}
+        icon={getIcon(pages.perfil.iconName)}
+      />
     </BottomNavigation>
   );
 };
 
-const TabNavigator = () => {
+const HomeScreen = () => {
+  //const theTabs = generateBottomNavigationTabs()
   return (
     <Navigator tabBar={(props) => <BottomTabBar {...props} />}>
-      {screens}
+      <Screen
+        name={pages.stats.screenName.toUpperCase()}
+        component={pages.stats.component}
+      />
+      <Screen
+        name={pages.sales.screenName.toUpperCase()}
+        component={pages.sales.component}
+      />
+      <Screen
+        name={pages.perfil.screenName.toUpperCase()}
+        component={pages.perfil.component}
+      />
     </Navigator>
   );
-};
-
-const HomeScreen = () => {
-  return <TabNavigator />;
 };
 
 export default HomeScreen;

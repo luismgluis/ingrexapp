@@ -25,7 +25,13 @@ const PerfilHeader = ({
         />
       );
     } else {
-      return <CIcon style={styles.avatar} />;
+      return (
+        <CIcon
+          name={"perfil/user"}
+          width={styles.avatar.width}
+          height={styles.avatar.height}
+        />
+      ); //style={styles.avatar}
     }
   };
   const primaryBtnClick = () => {
@@ -55,14 +61,20 @@ const PerfilHeader = ({
       </Layout>
       <Layout style={styles.containerBottom}>
         <Layout style={styles.panelActions}>
-          <CButton
-            icon={"plus-outline"}
-            onPress={primaryBtnClick}
-            type="primary"
-            textButton="Product"
-          />
-          <CButton icon={"plus-outline"} textButton="Product" />
-          <CButton icon={"activity-outline"} />
+          <Layout style={styles.panelActionsButton}>
+            <CButton
+              icon={"plus-outline"}
+              onPress={primaryBtnClick}
+              type="primary"
+              textButton="Add"
+            />
+          </Layout>
+          <Layout style={styles.panelActionsButton}>
+            <CButton icon={"share"} textButton="Share" />
+          </Layout>
+          <Layout style={{ ...styles.panelActionsButton, flex: 12 }}>
+            <CButton type="basic" /*danger*/ onlyIcon={true} icon={"heart"} />
+          </Layout>
         </Layout>
       </Layout>
     </Layout>
@@ -110,6 +122,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     maxHeight: 50,
     marginTop: 10,
+  },
+  panelActionsButton: {
+    marginHorizontal: 2,
   },
   panelActionsLeft: {
     flex: 5,

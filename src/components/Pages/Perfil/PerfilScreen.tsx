@@ -25,6 +25,7 @@ const MySelectPerfil = () => {
     console.log(TAG, key);
     dispatch(actionsGeneral.setCurrentBusiness(key));
   };
+
   const dropOptionsDefault = [
     {
       title: "Crear",
@@ -80,9 +81,10 @@ const MySelectPerfil = () => {
 const PerfilScreen = (props) => {
   console.log(TAG, "perfilScreen");
   const [imagesArray, setImagesArray] = useState<Array<FeedImageType>>([]);
-  const currentBusiness: Business = useSelector((store) => {
+  const currentBusiness: Business =
+    api.currentBusiness; /*useSelector((store) => {
     return store.generalApp.currentBusiness;
-  });
+  });*/
 
   useEffect(() => {
     // mounted

@@ -1,3 +1,4 @@
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { Layout, Text } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import {
@@ -20,9 +21,6 @@ const RenderItem = ({ item }) => {
   const datao: FeedImageType = item;
   const [data, setData] = useState(datao);
   const theKey = Utils.generateKey(`feedimages${data.key}`);
-  if (typeof data.uri == "undefined") {
-    return <></>;
-  }
 
   useEffect(() => {
     data.update((result: FeedImageType) => {
@@ -32,6 +30,13 @@ const RenderItem = ({ item }) => {
       }
     });
   }, []);
+
+  if (typeof data.uri == "undefined") {
+    return <></>;
+  }
+  if (data.uri == "") {
+    return <></>;
+  }
 
   return (
     <Pressable
@@ -108,7 +113,7 @@ export interface FeedImageType {
   key: string;
   uri: string;
   title: string;
-  timeStamp: number;
+  timeStamp: number | FirebaseFirestoreTypes.FieldValue;
   update: Function;
   onPress: Function;
 }
