@@ -5,10 +5,8 @@ import LoadingPanel from "../../UI/LoadingPanel/LoadingPanel";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../../libs/api/api";
 import * as actionsGeneral from "../../../actions/actionsGeneral";
-import { Business } from "../../../libs/api/interfaces";
 import utils from "../../../libs/utils/utils";
-import { NavigationActions, StackActions } from "react-navigation";
-import { CommonActions, NavigationState } from "@react-navigation/native";
+import { CommonActions } from "@react-navigation/native";
 
 let lastCurrentBusinessId = "";
 const cleanRoutes = (navigation, actualBusinessId = "") => {
@@ -80,6 +78,7 @@ const HomeStack = ({ navigation, route }) => {
         }
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   //const ss = utils.generateKey("s");
