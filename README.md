@@ -1,6 +1,6 @@
 # ingrexapp
 
-My base app to create React Native Projects
+My base app to project React Native apps
 
 To run
 
