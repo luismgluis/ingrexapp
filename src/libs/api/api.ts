@@ -5,8 +5,6 @@ import { User, Business, Product } from "./interfaces";
 import RNFetchBlob from "rn-fetch-blob";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import RNFS from "react-native-fs";
-import { all } from "core-js/fn/promise";
-import { time } from "console";
 
 const TAG = "API";
 
@@ -44,7 +42,7 @@ class Api {
       .collection("business")
       .where(firestore.FieldPath.documentId(), "in", arrId);
     const result = await myCollection.get();
-    let resBusiness: Array<Business> = [];
+    const resBusiness: Array<Business> = [];
     result.forEach((doc) => {
       const data = doc.data();
       console.log(TAG, data);
@@ -69,7 +67,7 @@ class Api {
     }
     return this.allBusiness;
   }
-  setCurrentBusiness(business: Business) {
+  setCurrentBusiness(business: Business): void {
     if (!(business instanceof Business)) {
       return null;
     }
@@ -79,24 +77,24 @@ class Api {
     this.currentBusiness = business;
   }
   async getProductsByBusiness(businessId = ""): Promise<Array<Product>> {
-    if (businessId == "") {
+    if (businessId === "") {
       businessId = this.currentBusiness.id;
     }
     const myCollection = firestore().collection("products");
     const resultProducts = await myCollection
       .where("business", "==", businessId)
       .get();
-    let allProducts = Array<Product>();
+    const allProducts = Array<Product>();
     resultProducts.forEach((doc) => {
       allProducts.push(new Product(doc.id, doc.data()));
     });
     return allProducts;
   }
   getProductsByBusinessEvent(businessId = "") {
-    if (businessId == "") {
+    if (businessId === "") {
       businessId = this.currentBusiness.id;
     }
-    let myUnSubscriber = () => {};
+    let myUnSubscriber: Function;
     const result: ProductsByBusinessEventType = {
       onUpdate: (fnResolve) => {
         try {
@@ -105,7 +103,7 @@ class Api {
             .where("business", "==", businessId)
             .where("imageUploaded", "==", true)
             .onSnapshot(function (resultProducts) {
-              let allProducts = Array<Product>();
+              const allProducts = Array<Product>();
               resultProducts.forEach((doc) => {
                 allProducts.push(new Product(doc.id, doc.data()));
               });
@@ -129,7 +127,9 @@ class Api {
         resolve("businessId or productId is empty");
         return;
       }
-      function getInternetFile() {
+      const pathStorageFile = `business/${businessId}/products/${productId}`;
+
+      function getInternetFile(): void {
         const reference = storage().ref(pathStorageFile);
         console.log(TAG, pathStorageFile);
         reference
@@ -154,7 +154,6 @@ class Api {
             reject(err);
           });
       }
-      const pathStorageFile = `business/${businessId}/products/${productId}`;
 
       AsyncStorage.getItem(pathStorageFile)
         .then((posibleUri) => {
@@ -180,6 +179,7 @@ class Api {
           }
         })
         .catch((err) => {
+          console.log(TAG, err);
           getInternetFile();
         });
     });
@@ -190,9 +190,9 @@ class Api {
   }
   async saveProduct(
     newProd: Product,
-    imageUri: string = "",
+    imageUri = "",
     callBackProgress: Function,
-  ) {
+  ): Promise<boolean> {
     console.log(TAG, "saveproduct");
 
     return new Promise<boolean>(async (resolve, reject) => {

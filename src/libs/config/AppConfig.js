@@ -1,5 +1,3 @@
-import TextFields from './textfields/textfields';
+import TextFields from "./textfields/textfields";
 
-export default {
-    TextFields: TextFields
-}
+export default { TextFields: TextFields };

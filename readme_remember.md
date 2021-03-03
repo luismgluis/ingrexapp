@@ -6,6 +6,8 @@ react-native bundle --platform android --dev false --entry-file index.js --bundl
 
 react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && sh ./scripts/clear-android-assets.sh
 
+react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+
 npx react-native run-android --variant=release
 
 # 1ro
