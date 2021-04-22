@@ -18,22 +18,14 @@ module.exports = {
       "error",
       { allowAllPropertiesOnSameLine: false },
     ],
+    //"dot-notation": ["error", { allowKeywords: false }]
+    "consistent-this": ["error", "that"],
+    "@typescript-eslint/no-this-alias": [
+      "error",
+      {
+        allowDestructuring: true, // Allow `const { props, state } = this`; false by default
+        allowedNames: ["that"] // Allow `const self = this`; `[]` by default
+      }
+    ],
   },
 };
-/*module.exports = {
-  root: true,
-  env: {
-    es6: true,
-    node: true,
-  },
-  extends: [
-    "react-app",
-    "eslint:recommended",
-  ],
-  rules: {
-    "@typescript-eslint/indent": ["error"],
-    quotes: ["error", "double"],
-    indent: ["error", 4],
-    "object-curly-spacing": ["error", "always"]
-  },
-}; */

@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "695752651787",
-    "project_id": "ingrexapp",
-    "storage_bucket": "ingrexapp.appspot.com"
+    "project_number": "845745401350",
+    "project_id": "ingrex-app",
+    "storage_bucket": "ingrex-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:695752651787:android:e08cc7aa253f32c236430e",
+        "mobilesdk_app_id": "1:845745401350:android:ea11d860ccede06de19d87",
         "android_client_info": {
           "package_name": "com.mysoftdnd.ingrexapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "695752651787-a595dhpqenstspp8amvlarolrek8t9bk.apps.googleusercontent.com",
+          "client_id": "845745401350-cjgsf2d6tjlt8mmg428bfbajvm1isjh9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.mysoftdnd.ingrexapp",
@@ -22,20 +22,20 @@
           }
         },
         {
-          "client_id": "695752651787-k5p4sl1bb4oag3ul4uu2lcs5uf7v40ld.apps.googleusercontent.com",
+          "client_id": "845745401350-nm0vlcgf50rvobgrih1keqo361851g78.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAPd1rd4wNnjDJDeR5Q3x6BPPaaHJbiIGQ"
+          "current_key": "AIzaSyBKwCjIMTN4skjZ_kPRfC27HkUMHngQUxM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "695752651787-k5p4sl1bb4oag3ul4uu2lcs5uf7v40ld.apps.googleusercontent.com",
+              "client_id": "845745401350-nm0vlcgf50rvobgrih1keqo361851g78.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

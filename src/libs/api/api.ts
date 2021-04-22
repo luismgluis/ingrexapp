@@ -1,269 +1,169 @@
-import firestore from "@react-native-firebase/firestore";
-import storage from "@react-native-firebase/storage";
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
-import { User, Business, Product } from "./interfaces";
-import RNFetchBlob from "rn-fetch-blob";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import UserType from "../types/UserType";
+import auth from "@react-native-firebase/auth";
 import RNFS from "react-native-fs";
+import ApiStorage from "./apiStorage";
+import ApiUsers from "./apiUsers";
+import ApiGroup from "./apiGroups";
+import ApiRoom from "./apiRoom";
+import utils from "../utils/utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import playerSounds from "../utils/playerSounds";
 
 const TAG = "API";
-
 class Api {
+  currentGroup: string;
+  storage: ApiStorage;
+  users: ApiUsers;
+  group: ApiGroup;
+  room: ApiRoom;
+  currentPlayerSouds: playerSounds;
   static instance: any;
-  myuser: FirebaseAuthTypes.User;
-  myinfo: User;
-  currentBusiness: Business;
-  allBusiness: Array<Business>;
   constructor() {
     if (typeof Api.instance === "object") {
       return Api.instance;
     }
     Api.instance = this;
-    this.myuser = auth().currentUser;
-    this.myinfo = new User();
-    this.currentBusiness = new Business();
-    this.allBusiness = null;
+    this.users = new ApiUsers();
+    this.group = new ApiGroup();
+    this.storage = new ApiStorage();
+    this.room = new ApiRoom();
+    this.currentPlayerSouds = new playerSounds();
     return this;
   }
-  async checkDefaults() {
-    if (this.myuser == null) {
-      this.myuser = auth().currentUser;
-    }
-    if (this.myinfo.uid == "") {
-      const userInfo = await this.getUserInfo(this.myuser.uid);
-      this.myinfo = userInfo;
-    }
-  }
-  async getBusinessByArrIds(arrId = []): Promise<Array<Business>> {
-    if (arrId.length == 0) {
-      return null;
-    }
-    const myCollection = firestore()
-      .collection("business")
-      .where(firestore.FieldPath.documentId(), "in", arrId);
-    const result = await myCollection.get();
-    const resBusiness: Array<Business> = [];
-    result.forEach((doc) => {
-      const data = doc.data();
-      console.log(TAG, data);
-      const buss = new Business(doc.id, data);
-      resBusiness.push(buss);
-    });
-    return resBusiness;
-  }
-  async getUserInfo(id: string) {
-    const userInfo = await firestore().collection("users").doc(id).get();
-    return new User(id, userInfo.data());
-  }
-  async getMyBusiness(): Promise<Array<Business>> {
-    await this.checkDefaults();
-    if (this.allBusiness == null) {
-      const theBusiness = await this.getBusinessByArrIds(this.myinfo.business);
-      this.allBusiness = theBusiness;
-    }
-    console.log(TAG, this.allBusiness);
-    if (this.currentBusiness.isEmpty()) {
-      //this.currentBusiness = this.allBusiness[0];
-    }
-    return this.allBusiness;
-  }
-  setCurrentBusiness(business: Business): void {
-    if (!(business instanceof Business)) {
-      return null;
-    }
-    if (business.isEmpty()) {
-      return null;
-    }
-    this.currentBusiness = business;
-  }
-  async getProductsByBusiness(businessId = ""): Promise<Array<Product>> {
-    if (businessId === "") {
-      businessId = this.currentBusiness.id;
-    }
-    const myCollection = firestore().collection("products");
-    const resultProducts = await myCollection
-      .where("business", "==", businessId)
-      .get();
-    const allProducts = Array<Product>();
-    resultProducts.forEach((doc) => {
-      allProducts.push(new Product(doc.id, doc.data()));
-    });
-    return allProducts;
-  }
-  getProductsByBusinessEvent(businessId = "") {
-    if (businessId === "") {
-      businessId = this.currentBusiness.id;
-    }
-    let myUnSubscriber: Function;
-    const result: ProductsByBusinessEventType = {
-      onUpdate: (fnResolve) => {
-        try {
-          const myCollection = firestore().collection("products");
-          const subscriber = myCollection
-            .where("business", "==", businessId)
-            .where("imageUploaded", "==", true)
-            .onSnapshot(function (resultProducts) {
-              const allProducts = Array<Product>();
-              resultProducts.forEach((doc) => {
-                allProducts.push(new Product(doc.id, doc.data()));
-              });
-              console.log(TAG, "All products Snapshot is ", allProducts);
-              fnResolve(allProducts);
-            });
-          myUnSubscriber = subscriber;
-        } catch (error) {
-          fnResolve(null);
-        }
-      },
-      unSubcriber: () => {
-        myUnSubscriber();
-      },
-    };
-    return result;
-  }
-  getProductImage(businessId = "", productId = ""): Promise<string> {
-    return new Promise<string>(async (resolve, reject) => {
-      if (businessId == "" || productId == "") {
-        resolve("businessId or productId is empty");
-        return;
-      }
-      const pathStorageFile = `business/${businessId}/products/${productId}`;
+  checkLoginByEmail(email, pass) {
+    const that = this;
 
-      function getInternetFile(): void {
-        const reference = storage().ref(pathStorageFile);
-        console.log(TAG, pathStorageFile);
-        reference
-          .getDownloadURL()
-          .then((theUrl) => {
-            RNFetchBlob.config({
-              fileCache: true,
-              appendExt: "jpg",
+    function login(resolve, reject) {
+      auth() //'grajales805@gmail.com', 'elpepe'
+        .signInWithEmailAndPassword(email, pass)
+        .then(() => {
+          const me = auth().currentUser;
+          that.users
+            .getUserByID(me.uid)
+            .then((data) => {
+              that.users.currentUser = data;
+              resolve(true);
             })
-              .fetch("GET", theUrl)
-              .then((resultFetch) => {
-                console.log(TAG, "resultFetch", resultFetch);
-                const finalUri = "file://" + resultFetch.path();
-                AsyncStorage.setItem(pathStorageFile, finalUri);
-                resolve(finalUri); //---------------------
-              })
-              .catch((err) => {
-                reject(err);
-              });
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      }
-
-      AsyncStorage.getItem(pathStorageFile)
-        .then((posibleUri) => {
-          if (posibleUri !== null) {
-            RNFS.exists(posibleUri)
-              .then((fileExists) => {
-                if (fileExists) {
-                  resolve(posibleUri);
-                } else {
-                  getInternetFile();
-                }
-              })
-              .catch((err) => {
-                console.log(
-                  TAG,
-                  "File checker error --> proced to download file",
-                  err,
-                );
-                getInternetFile();
-              });
-          } else {
-            getInternetFile();
+            .catch((err) => {
+              console.error(TAG, err);
+              that.users.currentUser = new UserType("", {});
+              resolve(false);
+            });
+        })
+        .catch((error) => {
+          if (error.code === "auth/email-already-in-use") {
+            console.error(TAG, "That email address is already in use!");
           }
+
+          if (error.code === "auth/invalid-email") {
+            console.error(TAG, "That email address is invalid!");
+          }
+          reject(error);
+        });
+    }
+    return new Promise<boolean>((resolve, reject) => {
+      try {
+        login(resolve, reject);
+      } catch (error) {
+        reject(null);
+      }
+    });
+  }
+  logOut() {
+    const that = this;
+    this.users = new ApiUsers();
+    this.group = new ApiGroup();
+    this.storage = new ApiStorage();
+    this.room = new ApiRoom();
+    this.currentPlayerSouds = new playerSounds();
+    auth()
+      .signOut()
+      .then(() => console.warn("User signed out!"));
+  }
+  createUserWithEmail(data) {
+    const that = this;
+
+    const avaibleToCreate = async () => {
+      const user = await that.users.getUserByEmail(data.email);
+      if (user !== null) {
+        return false;
+      }
+      return true;
+    };
+    const saveInfo = (uid, resolve, reject) => {
+      const user = new UserType(uid, null, {
+        id: uid,
+        name: data.name,
+        nickname: data.nickname,
+        email: data.email,
+        creationDate: utils.dates.dateNowUnix(),
+        profileImage: data.profileImage.uri,
+      });
+
+      that.users
+        .saveUser(user)
+        .then((result) => {
+          resolve(true);
         })
         .catch((err) => {
-          console.log(TAG, err);
-          getInternetFile();
+          reject(false);
+          console.error(TAG, "err", err);
         });
+    };
+    const create = (resolve, reject) => {
+      auth()
+        .createUserWithEmailAndPassword(data.email, data.password1)
+        .then((result) => {
+          console.error(TAG, "res", result);
+          saveInfo(result.user.uid, resolve, reject);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    };
+    return new Promise<boolean>((resolve, reject) => {
+      try {
+        create(resolve, reject);
+      } catch (error) {
+        reject(null);
+      }
     });
   }
-  async getMyInfo() {
-    await this.checkDefaults();
-    return await this.getUserInfo(this.myuser.uid);
-  }
-  async saveProduct(
-    newProd: Product,
-    imageUri = "",
-    callBackProgress: Function,
-  ): Promise<boolean> {
-    console.log(TAG, "saveproduct");
-
-    return new Promise<boolean>(async (resolve, reject) => {
+  downLoadFile(url: string): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
       try {
-        if (this.currentBusiness.isEmpty()) {
-          resolve(null);
+        const saveFile = await AsyncStorage.getItem(url);
+
+        const path = `${utils.generateKey("file")}.media`;
+
+        const down = () => {
+          utils.createFile("down", path, "CACHE").then((info) => {
+            RNFS.downloadFile({
+              fromUrl: url,
+              toFile: info.path,
+            }).promise.then(async (r) => {
+              resolve(info.path);
+              await AsyncStorage.setItem(url, info.path);
+            });
+          });
+        };
+
+        if (saveFile == null) {
+          down();
           return;
         }
-
-        const businessId = this.currentBusiness.id;
-        console.log(TAG, "Business ID = ", businessId, ", prod = ", newProd);
-
-        if (!(newProd instanceof Product)) {
-          reject("newProd isn't an instance of Product");
-          return;
-        }
-        if (newProd.isEmpty(["id"])) {
-          console.log(TAG, "SaveProduct is empty");
-          reject("newProd is empty");
-          return;
-        }
-
-        if (newProd.timeStamp == 0) {
-          const timestamp = firestore.FieldValue.serverTimestamp();
-          newProd.timeStamp = timestamp;
-          //resultNewProduct.update({ timeStamp: timestamp });
-        }
-
-        const myCollection = firestore().collection("products");
-        const resultNewProduct = await myCollection.add(newProd);
-
-        console.log(TAG, "saveProduct Add", resultNewProduct);
-
-        const pathStorageFile = `business/${businessId}/products/${resultNewProduct.id}`;
-        console.log(TAG, pathStorageFile);
-
-        const reference = storage().ref(pathStorageFile);
-        const task = reference.putFile(imageUri);
-
-        task.on("state_changed", (taskSnapshot) => {
-          console.log(
-            TAG,
-            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-          );
-          callBackProgress(taskSnapshot.bytesTransferred);
-        });
-
-        task.then(() => {
-          console.log(TAG, "Image uploaded to the bucket!");
-          resultNewProduct.update({ imageUploaded: true });
-          resolve(true);
-        });
-        task.catch((error) => {
-          console.log(TAG, "Upload Product Catch", error);
-          resultNewProduct.delete();
-          reject("Upload image failed");
+        RNFS.exists(saveFile).then((exists) => {
+          if (exists) {
+            resolve(saveFile);
+            return;
+          }
+          down();
         });
       } catch (error) {
-        console.log(TAG, "saveProduct", error);
-        reject("Upload image process failed");
+        reject(null);
       }
     });
   }
 }
+
 export default new Api();
-
-export type callbackProducts = (products: Array<Product>) => void;
-
-export type FnBackProductsArray = (fn: callbackProducts) => void;
-
-export interface ProductsByBusinessEventType {
-  onUpdate: FnBackProductsArray;
-  unSubcriber: Function;
-}

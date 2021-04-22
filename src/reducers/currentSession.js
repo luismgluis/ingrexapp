@@ -1,26 +1,16 @@
 const INITIAL_STATE = {
-  user: {},
-  users: [],
+  user: null,
+  group: null,
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case "traer_usuarios":
+    case "setGroup":
       return {
         ...state,
-        users: action.payload,
+        group: action.payload,
       };
-    case "loginWithEmail":
-      return {
-        ...state,
-        user: action.payload,
-      };
-    case "updateCurrentUser":
-      return {
-        ...state,
-        user: action.payload,
-      };
-    case "get_user":
+    case "setUser":
       return {
         ...state,
         user: action.payload,
