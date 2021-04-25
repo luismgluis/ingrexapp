@@ -1,4 +1,5 @@
 /* eslint-disable indent */
+
 /* eslint-disable prettier/prettier */
 module.exports = {
   root: true,
@@ -24,8 +25,8 @@ module.exports = {
       "error",
       {
         allowDestructuring: true, // Allow `const { props, state } = this`; false by default
-        allowedNames: ["that"] // Allow `const self = this`; `[]` by default
-      }
+        allowedNames: ["that"], // Allow `const self = this`; `[]` by default
+      },
     ],
   },
 };

@@ -1,10 +1,12 @@
 import * as React from "react";
 import Svg, { Path, SvgProps } from "react-native-svg";
 /* SVGR has dropped some elements not supported by react-native-svg: link, style */
-
-const SendIcon: React.FC<SvgProps> = (props) => {
+interface SendIconType extends SvgProps {
+  colorTwo: string;
+}
+const SendIcon: React.FC<SendIconType> = (props) => {
   const color = props.color || "#818181";
-  const colorTwo = props.color || "#818181";
+  const colorTwo = props.colorTwo || "#818181";
 
   return (
     <Svg width={512} height={512} viewBox="0 0 512 512" {...props}>

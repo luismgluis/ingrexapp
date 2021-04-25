@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Icon, Input } from "@ui-kitten/components";
 import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import CInput from "../../CInput/CInput";
+import utils from "../../../libs/utils/utils";
 
 const styles = StyleSheet.create({ container: {} });
 
@@ -40,9 +41,14 @@ const LoginInputSecure: React.FC<LoginInputSecureProps> = ({
       <Icon {...props1} name={secureTextEntry ? "eye-off" : "eye"} />
     </TouchableWithoutFeedback>
   );
+  const inputStyles = {
+    ...utils.objects.cloneObject(style),
+    height: 70,
+    backgroundColor: "blue",
+  };
   return (
     <CInput
-      style={style}
+      style={inputStyles}
       value={password}
       label={label}
       placeholder={placeholder}

@@ -20,7 +20,12 @@ const CRBBButtonSend: React.FC<CRBBButtonClipProps> = ({
     <View style={cstyles}>
       <CButton
         imageInsertComponent={() => (
-          <SendIcon color={theme["color-basic-500"]} width={30} height={30} />
+          <SendIcon
+            color={theme["color-primary-400"]}
+            colorTwo={theme["color-primary-500"]}
+            width={30}
+            height={30}
+          />
         )}
         onPress={onPress}
       />

@@ -137,8 +137,9 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         compileSdkVersion 29
-        versionCode 2
-        versionName "1.0.2"
+        versionCode 1
+        versionName "1.0.1"
+        missingDimensionStrategy "react-native-camera", "general"
     }
     splits {
         abi {
@@ -221,7 +222,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
-
-
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

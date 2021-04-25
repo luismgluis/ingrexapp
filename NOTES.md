@@ -3,3 +3,5 @@
 ./gradlew assembleRelease
 
 ./gradlew assembleDebug
+
+./gradlew signingReport

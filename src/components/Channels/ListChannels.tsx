@@ -30,6 +30,7 @@ const ListChannels: React.FC<ListChannelsProps> = ({
 
   const changeSelection = useCallback(
     (channel: ChannelsListItem) => {
+      console.log(TAG, "channel", channel);
       setChannelSelected(channel);
       onChange(channel);
     },
@@ -61,7 +62,7 @@ const ListChannels: React.FC<ListChannelsProps> = ({
         renderItem={(item) => (
           <ListChannelItem
             underline={getUnderline(item.item)}
-            onPress={(channelID) => changeSelection(channelID)}
+            onPress={(channelItem) => changeSelection(channelItem)}
             listItem={item.item}
           />
         )}

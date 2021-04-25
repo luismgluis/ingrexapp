@@ -27,9 +27,9 @@ export class AppMainModuleAlert {
     return this.closed;
   }
   close(): void {
-    this.setValue(null);
+    this.setChild(null);
   }
-  setValue(newVal = null): void {
+  setChild(newVal = null): void {
     if (newVal == null) {
       this.closed = true;
       newVal = <></>;

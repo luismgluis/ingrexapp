@@ -15,14 +15,17 @@ import CInput from "../../CInput/CInput";
 const styles = StyleSheet.create({
   spinner: { padding: 30 },
   input: { marginBottom: 30 },
-  container: { padding: 50 },
+  container: { paddingTop: 30 },
   warningText: { marginTop: 20 },
   icon: { marginBottom: 20 },
-  createButton: { paddingTop: 20 },
+  createButton: { paddingTop: 0 },
   panelTheme: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
+    width: "100%",
+    alignItems: "flex-end",
+  },
+  panelTitle: {
+    width: "100%",
+    alignItems: "center",
   },
 });
 
@@ -37,8 +40,8 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation, route }) => {
       return true;
     }),
   );
-  const [password, setPassword] = useState("20081601");
-  const [user, setUser] = useState("pruebasmysoftdnd@gmail.com");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState("");
   const [warningInfo, setWarningInfo] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -68,54 +71,69 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation, route }) => {
   const goCreateAccount = () => {
     navigation.navigate("LoginCreateAccount");
   };
-
+  /**<Panel verticalCenter={true} totalHeight={"100%"}>
+        </Panel> */
   return (
-    <Panel totalHeight={0}>
-      <Panel
-        verticalCenter={true}
-        paddingHorizontal={50}
-        style={styles.container}>
-        <AppIcon style={styles.icon} width={100} height={100} />
-        <Text category="h4">EnRed</Text>
+    <>
+      <Panel verticalCenter={true} totalHeight={0} paddingHorizontal={50}>
+        <View style={styles.container}>
+          <View style={styles.panelTitle}>
+            <AppIcon style={styles.icon} width={100} height={100} />
+            <Text category="h4">Accessa</Text>
+          </View>
+          {!loading && (
+            <>
+              <View>
+                <CInput
+                  style={styles.input}
+                  value={user}
+                  label="User"
+                  placeholder="Example@email.com"
+                  onChangeText={(nextValue) => setUser(nextValue)}
+                />
+                <LoginInputSecure
+                  label="Password"
+                  placeholder="*******"
+                  password={password}
+                  setPassword={setPassword}
+                />
+              </View>
+              <Panel paddingHorizontal={35} paddingVertical={35}>
+                <CButton
+                  paddingVertical={10}
+                  text="Login"
+                  onPress={checkLogin}
+                />
+                {warningInfo !== "" && (
+                  <Text style={styles.warningText} status="danger">
+                    {warningInfo}
+                  </Text>
+                )}
+                <CButton
+                  style={styles.createButton}
+                  appeareance="ghost"
+                  text="Create account"
+                  onPress={goCreateAccount}
+                />
+              </Panel>
+            </>
+          )}
+          {loading && (
+            <Panel
+              paddingVertical={50}
+              horizontalCenter={true}
+              style={styles.spinner}>
+              <Spinner size="giant" />
+            </Panel>
+          )}
+        </View>
         {!loading && (
-          <>
-            <CInput
-              style={styles.input}
-              value={user}
-              label="User"
-              placeholder="Example@email.com"
-              onChangeText={(nextValue) => setUser(nextValue)}
-            />
-            <LoginInputSecure
-              label="Password"
-              placeholder="*******"
-              password={password}
-              setPassword={setPassword}
-            />
-            <CButton text="Login" onPress={checkLogin} />
-            {warningInfo !== "" && (
-              <Text style={styles.warningText} status="danger">
-                {warningInfo}
-              </Text>
-            )}
-            <CButton
-              style={styles.createButton}
-              appeareance="ghost"
-              text="Create account"
-              onPress={goCreateAccount}
-            />
-            <View style={styles.panelTheme}>
-              <ThemeToggle />
-            </View>
-          </>
-        )}
-        {loading && (
-          <View style={styles.spinner}>
-            <Spinner size="giant" />
+          <View style={styles.panelTheme}>
+            <ThemeToggle />
           </View>
         )}
       </Panel>
-    </Panel>
+    </>
   );
 };
 export default LoginScreen;

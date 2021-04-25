@@ -8,7 +8,6 @@ import React, {
 import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
-import MapScreen from "../MapScreen/MapScreen";
 import Panel from "../Panel/Panel";
 import HomeTopBar from "./HomeTopBar";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,6 +22,10 @@ import ListChannels from "../Channels/ListChannels";
 import GroupType from "../../libs/types/GroupType";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentReduxGroup } from "../../reducers/actions/actionsCurrentSession";
+import UsersAccess from "../UsersAccess/UsersAccess";
+import UsersHistory from "../UsersHistory/UsersHistory";
+import UsersRegister from "../UsersRegister/UsersRegister";
+import api from "../../libs/api/api";
 const TAG = "HOME";
 
 const styles = StyleSheet.create({
@@ -47,7 +50,7 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
   const [CFORCE, setCFORCE] = useState(0);
   const [withoutGroups, setWithoutGroups] = useState(false);
   const [channelsLoading, setChannelsLoading] = useState(true);
-  const [selectedIndexPage, setSelectedIndexPage] = useState(1);
+  const [selectedIndexPage, setSelectedIndexPage] = useState(0);
 
   const currentGroup = useSelector<GroupType, GroupType>((state: any) => {
     if (state.currentSession.group) {
@@ -62,6 +65,18 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
 
   const module = useMemo(() => new HomeModule(theme), [theme]);
 
+  const selectGroup = useCallback(
+    (firsTime: boolean) => {
+      module.alertJoinToGroup((data) => {
+        console.log(TAG, "data", data);
+        if (data !== null) {
+          dispatch(setCurrentReduxGroup(data));
+        }
+        setCFORCE(CFORCE + 1);
+      }, firsTime);
+    },
+    [module, CFORCE, dispatch],
+  );
   useEffect(() => {
     if (channelsListItems.length > 0 || withoutGroups)
       setChannelsLoading(false);
@@ -69,18 +84,16 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
 
   useEffect(() => {
     if (withoutGroups) {
-      module.alertJoinToGroup((data) => {
-        console.log(TAG, "data", data);
-        if (data !== null) {
-          dispatch(setCurrentReduxGroup(data));
-        }
-        setCFORCE(CFORCE + 1);
-      });
+      selectGroup(true);
     }
-  }, [withoutGroups, module, CFORCE, dispatch]);
+    return () => module.closeCurrentAlert();
+  }, [withoutGroups, selectGroup, module]);
 
   useEffect(() => {
     const onLoadChannels = (channelsLoaded: ChannelsListItem[]) => {
+      if (currentGroup.isEmpty()) {
+        dispatch(setCurrentReduxGroup(api.group.currentGroupData));
+      }
       if (channelsLoaded.length === 0) {
         setWithoutGroups(true);
         return;
@@ -89,16 +102,20 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
       setChannelsListItems(channelsLoaded);
     };
     if (CFORCE >= 0) module.getChannels((data) => onLoadChannels(data));
-  }, [withoutGroups, module, CFORCE]);
+  }, [withoutGroups, module, CFORCE, dispatch, currentGroup]);
 
   const onChangeListChannels = useCallback((listItem: ChannelsListItem) => {
     pagerViewRef.current?.setPage(listItem.index);
     setSelectedIndexPage(listItem.index);
   }, []);
 
+  console.log(TAG, "selectedIndexPage", selectedIndexPage);
   return (
     <Panel key={"GroupHomeKey" + currentGroup.id} style={styles.paper}>
-      <HomeTopBar gropSelected={currentGroup} />
+      <HomeTopBar
+        onGroupPress={() => selectGroup(false)}
+        gropSelected={currentGroup}
+      />
       {channelsListItems.length > 0 && (
         <ListChannels
           channelsList={channelsListItems}
@@ -123,17 +140,29 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
                   <ChatRoom roomID={item.channel.chatRoomID} />
                 </View>
               );
-            }
-            if (item.module === "map") {
+            } else {
               return (
-                <View
-                  key={utils.generateKey("MapScreen")}
-                  style={styles.pagerPanel}>
-                  <MapScreen pagerFocus={item.index === selectedIndexPage} />
+                <View key={item.module + item.key} style={styles.pagerPanel}>
+                  <>
+                    {item.module === "access" && (
+                      <UsersAccess
+                        pagerFocus={item.index === selectedIndexPage}
+                      />
+                    )}
+                    {item.module === "history" && (
+                      <UsersHistory
+                        pagerFocus={item.index === selectedIndexPage}
+                      />
+                    )}
+                    {item.module === "register" && (
+                      <UsersRegister
+                        pagerFocus={item.index === selectedIndexPage}
+                      />
+                    )}
+                  </>
                 </View>
               );
             }
-            return <></>;
           })}
         </PagerView>
       )}

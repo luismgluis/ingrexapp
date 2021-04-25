@@ -19,6 +19,7 @@ export interface LayoutProps extends ViewProps, LayoutStyledProps {
   level?: "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
   totalHeight?: number | string;
   verticalCenter?: boolean;
+  horizontalCenter?: boolean;
   withScroll?: boolean;
   paddingVertical?: number;
   paddingHorizontal?: number;
@@ -34,6 +35,8 @@ const Panel: React.FC<LayoutProps> = ({
   paddingHorizontal = 0,
   totalHeight = -1,
   verticalCenter = false,
+  horizontalCenter = false,
+
   withScroll = false,
 }) => {
   const [keyboardHeight] = useKeyboard();
@@ -77,14 +80,14 @@ const Panel: React.FC<LayoutProps> = ({
       if (withScroll) {
         customStyles.height += keyboardHeight;
       }
+    } else if (`${totalHeight}`.includes("px")) {
+      const total = Number(`${totalHeight}`.replace("px", ""));
+      customStyles.height = total;
     }
   }
 
-  if (verticalCenter) {
-    customStyles.justifyContent = "center"; //Centered vertically
-    customStyles.alignItems = "center"; // Centered horizontally
-    customStyles.flex = 1;
-  }
+  if (verticalCenter) customStyles.justifyContent = "center";
+  if (horizontalCenter) customStyles.alignItems = "center";
 
   const nstyles = {
     ...customStyles,

@@ -8,29 +8,37 @@ import { CAlertEmpty, CAlertQuestion } from "../CAlert/CAlertNotification";
 import CButton from "../CButton/CButton";
 import DoneDealIcon from "../Icons/others/DoneDealIcon";
 import TeamIcon from "../Icons/others/TeamIcon";
-import JoinGroup from "../JoinGroup/JoinGroup";
+import JoinGroup from "../Group/JoinGroup";
 import Panel from "../Panel/Panel";
 import CInput from "./../CInput/CInput";
+import CreateGroup from "../Group/CreateGroup";
 const TAG = "HOME MODULE";
 
 export type ChannelsListItem = {
   key: string;
   index: number;
   withIcon: boolean;
-  module: "camera" | "map" | "channel";
+  module: "access" | "history" | "register" | "channel";
   channel?: ChannelType;
 };
 
 export default class HomeModule {
   theme: Array<any>;
+  currentAlert: any;
   constructor(theme) {
     this.theme = theme;
+    this.currentAlert = null;
   }
-  alertJoinToGroup(callBack: (data) => void): void {
+  alertJoinToGroup(
+    callBack: (data: GroupType) => void,
+    firsTime: boolean,
+  ): void {
     const that = this;
     const alert = CAlertQuestion(
       "Hello",
-      "it seems that you still do not belong to a group",
+      firsTime
+        ? "it seems that you still do not belong to a group"
+        : "Do you want to change group?",
       <TeamIcon
         width={150}
         height={150}
@@ -51,7 +59,10 @@ export default class HomeModule {
           alert.close();
         },
       },
+      null,
+      firsTime,
     );
+    that.currentAlert = alert;
     const onPressJoin = () => {
       that.joinGroup((data) => {
         if (data == null) {
@@ -61,7 +72,10 @@ export default class HomeModule {
         that.confirmJoinToGroup(data, (res) => {
           console.log(TAG, res);
           if (res) callBack(data);
-          if (!res) alert.show();
+          if (!res) {
+            alert.show();
+            that.currentAlert = alert;
+          }
         });
       });
     };
@@ -97,21 +111,25 @@ export default class HomeModule {
         onPress: () => callBack(false),
       },
     );
+    that.currentAlert = alert;
   }
   joinGroup(callBack: (data: GroupType) => void): void {
-    CAlertEmpty(
+    const that = this;
+    const alert = CAlertEmpty(
       <>
         <JoinGroup callBack={callBack} />
       </>,
     );
+    that.currentAlert = alert;
   }
-  createGroup(callBack: (data) => void): void {
-    CAlertEmpty(
+  createGroup(callBack: (data: GroupType) => void): void {
+    const that = this;
+    const alert = CAlertEmpty(
       <>
-        <Text>gogo create group</Text>
-        <CButton text="close" onPress={() => callBack(null)} />
+        <CreateGroup callBack={(data) => callBack(data)} />
       </>,
     );
+    that.currentAlert = alert;
   }
   getChannels(callBack: (data: Array<ChannelsListItem>) => void): void {
     api.group
@@ -122,14 +140,28 @@ export default class HomeModule {
           //onChange(null);
           return;
         }
+
+        let index = -1;
         const newData = [];
-        newData.unshift({
-          index: 0,
-          key: "{MAP-MODULE}",
+        newData.push({
+          index: ++index,
+          key: "{ACCESS-MODULE}",
           withIcon: true,
-          module: "map",
+          module: "access",
         });
-        let index = 0;
+        newData.push({
+          index: ++index,
+          key: "{HISTORY-MODULE}",
+          withIcon: true,
+          module: "history",
+        });
+        newData.push({
+          index: ++index,
+          key: "{REGISTER-MODULE}",
+          withIcon: true,
+          module: "register",
+        });
+
         const newMapData: Array<ChannelsListItem> = data.map((channel) => ({
           index: ++index,
           key: channel.chatRoomID,
@@ -137,7 +169,7 @@ export default class HomeModule {
           channel: channel,
           module: "channel",
         }));
-
+        console.log(TAG, newData);
         newData.push(...newMapData);
         callBack(newData);
       })
@@ -145,5 +177,8 @@ export default class HomeModule {
         console.error(TAG, err);
         callBack([]);
       });
+  }
+  closeCurrentAlert(): void {
+    this.currentAlert?.close();
   }
 }

@@ -21,12 +21,8 @@ const styles = StyleSheet.create({
   avatar: {
     width: 100,
     height: 100,
-    backgroundColor: "red",
   },
-  divider: {
-    backgroundColor: "red",
-    height: 10,
-  },
+  divider: { height: 10 },
 });
 
 const TAG = "LOGIN CREATE ACCOUNT";
@@ -45,11 +41,11 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
     }),
   );
   const [form, setForm] = useState({
-    name: "mysoft",
-    nickname: "mysoft",
-    email: "mysoftdnd@gmail.com",
-    password1: "2008160100",
-    password2: "2008160100",
+    name: "",
+    nickname: "",
+    email: "",
+    password1: "",
+    password2: "",
   });
 
   const [profileImage, setProfileImage] = useState({
@@ -97,7 +93,9 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
       <Panel
         withScroll={true}
         totalHeight={30}
+        paddingHorizontal={50}
         verticalCenter={true}
+        horizontalCenter={true}
         style={styles.container}>
         <PerfilAvatar
           imageUri={profileImage.uri}
@@ -166,7 +164,7 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
           }
         />
         <Divider style={styles.divider} />
-        <CButton text="Create" onPress={create} />
+        <CButton paddingVertical={20} text="Create" onPress={create} />
       </Panel>
     </Panel>
   );

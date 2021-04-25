@@ -6,3 +6,4 @@ module.exports = {
   endOfLine: 'crlf',
   "tabWidth": 2,
 };
+

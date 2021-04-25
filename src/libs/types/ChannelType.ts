@@ -1,14 +1,25 @@
-export class ChannelType {
+interface ChannelTypeType {
   id: string;
   name: string;
-  admins: Array<string>;
+  onlyAdmins: boolean;
   creationDate: number;
   creator: string;
   chatRoomID: string;
-  constructor(id: string, data: any) {
+}
+export class ChannelType {
+  id: string;
+  name: string;
+  onlyAdmins: boolean;
+  creationDate: number;
+  creator: string;
+  chatRoomID: string;
+  constructor(id: string, data: any, datax?: ChannelTypeType) {
+    if (data == null) {
+      data = datax;
+    }
     this.id = id;
     this.name = data.name || "";
-    this.admins = data.admins || "";
+    this.onlyAdmins = data.onlyAdmins || false;
     this.creationDate = data.creationDate || [];
     this.creator = data.creator || "";
     this.chatRoomID = data.chatRoomID || "";
@@ -18,5 +29,15 @@ export class ChannelType {
       return true;
     }
     return false;
+  }
+  exportToUpload(): any {
+    const that = this;
+    return {
+      name: that.name || "",
+      onlyAdmins: that.onlyAdmins || false,
+      creationDate: that.creationDate || [],
+      creator: that.creator || "",
+      chatRoomID: that.chatRoomID || "",
+    };
   }
 }

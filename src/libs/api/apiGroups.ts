@@ -2,10 +2,13 @@ import { ChannelType } from "../types/ChannelType";
 import firestore from "@react-native-firebase/firestore";
 import ApiUsers from "./apiUsers";
 import GroupType from "../types/GroupType";
+import utils from "../utils/utils";
+import UserType from "../types/UserType";
 
 const TAG = "API GROUPS";
 class ApiGroup {
   currentGroup: string;
+  currentGroupData: GroupType;
   apiUsers: ApiUsers;
   constructor() {
     this.apiUsers = new ApiUsers();
@@ -13,8 +16,8 @@ class ApiGroup {
 
     /* */
   }
-  getGroupByID(id: string): Promise<ChannelType> {
-    return new Promise<ChannelType>((resolve, reject) => {
+  getGroupByID(id: string): Promise<GroupType> {
+    return new Promise<GroupType>((resolve, reject) => {
       try {
         const groupsCollection = firestore().collection("groups");
         groupsCollection
@@ -24,7 +27,7 @@ class ApiGroup {
             const data: any = res.data();
 
             if (data !== null) {
-              resolve(new ChannelType(id, data));
+              resolve(new GroupType(id, data));
               return;
             }
             reject(null);
@@ -109,20 +112,16 @@ class ApiGroup {
       const channelsCollection = firestore().collection("groups_channels");
       channelsCollection
         .doc(groupId)
+        .collection("channels")
         .get()
         .then((res) => {
-          const data: any = res.data();
-
-          if (data !== null) {
-            const arr = Array<ChannelType>();
-            for (const key in data) {
-              if (!Object.prototype.hasOwnProperty.call(data, key)) {
-                return;
-              }
-              const element = data[key];
-              arr.push(new ChannelType(key, element));
-            }
+          const arr = Array<ChannelType>();
+          if (res !== null) {
+            res.forEach((doc) => {
+              arr.push(new ChannelType(doc.id, doc.data()));
+            });
             resolve(arr);
+            return;
           }
           reject(null);
         })
@@ -138,7 +137,15 @@ class ApiGroup {
             that.getUserGroups(uid).then((channelsList) => {
               if (channelsList.length > 0) {
                 that.currentGroup = channelsList[0];
-                getFromFirebase(that.currentGroup, resolve, reject);
+                that
+                  .getGroupByID(that.currentGroup)
+                  .then((groupData) => {
+                    that.currentGroupData = groupData;
+                    getFromFirebase(that.currentGroup, resolve, reject);
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
                 return;
               }
               resolve(null);
@@ -178,41 +185,132 @@ class ApiGroup {
       }
     });
   }
+  addChannelToMyGroup(
+    me: UserType,
+    groupID: string,
+    name: string,
+  ): Promise<ChannelType> {
+    console.log(TAG, "addcahnnel");
+    const groupsCollection = firestore().collection("groups_channels");
+
+    const groupsChatRoomsCollection = firestore().collection(
+      "groups_chat_rooms",
+    );
+    const newChatRoom = groupsChatRoomsCollection.doc();
+    groupsChatRoomsCollection.doc(newChatRoom.id).set({ groupID: groupID });
+
+    const newChannel = new ChannelType(newChatRoom.id, null, {
+      id: newChatRoom.id,
+      chatRoomID: newChatRoom.id,
+      creationDate: utils.dates.dateNowUnix(),
+      name: name,
+      onlyAdmins: false,
+      creator: me.id,
+    });
+
+    return new Promise<ChannelType>((resolve, reject) => {
+      try {
+        const data = newChannel.exportToUpload();
+        groupsCollection
+          .doc(groupID)
+          .collection("channels")
+          .add(data)
+          .then(() => {
+            console.log(TAG, "yes");
+            resolve(newChannel);
+          })
+          .catch((err) => {
+            console.log(TAG, "fail");
+            reject(err);
+          });
+      } catch (error) {
+        reject(null);
+      }
+    });
+  }
+  addGroupToMyGroups(me: UserType, groupID: string, resolve, reject): void {
+    const groupsCollection = firestore().collection("users_groups");
+    const newField = {};
+    newField[groupID] = 1;
+    groupsCollection
+      .doc(me.id)
+      .set(newField)
+      .then(() => resolve(true))
+      .catch((err) => reject(err));
+  }
+  addMeToGroupUsers(me: UserType, groupID: string): Promise<void> {
+    const groupsCollection = firestore().collection("groups_users");
+    const newField = {};
+    newField[me.id] = 1;
+    return groupsCollection.doc(groupID).set(newField);
+  }
   joinGroup(groupID: string): Promise<boolean> {
     const that = this;
     const me = that.apiUsers.currentUser;
-    const addGroupToMyGroups = (resolve, reject) => {
-      const groupsCollection = firestore().collection("users_groups");
-      const newField = {};
-      newField[groupID] = 1;
-      groupsCollection
-        .doc(me.id)
-        .set(newField)
-        .then(() => resolve(true))
-        .catch(() => reject(null));
-    };
-    const addMeToGroupUsers = (resolve, reject) => {
-      const groupsCollection = firestore().collection("groups_users");
-      const newField = {};
-      newField[me.id] = 1;
-      groupsCollection
-        .doc(groupID)
-        .set(newField)
-        .then(() => addGroupToMyGroups(resolve, reject))
-        .catch(() => reject(null));
-    };
+
     return new Promise<boolean>((resolve, reject) => {
       try {
         that
           .getGroupByID(groupID)
           .then((group) => {
             if (!group.isEmpty()) {
-              addMeToGroupUsers(resolve, reject);
+              that
+                .addMeToGroupUsers(me, groupID)
+                .then(() =>
+                  that.addGroupToMyGroups(me, groupID, resolve, reject),
+                )
+                .catch((err) => reject(err));
               return;
             }
             reject(null);
           })
           .catch(() => reject(null));
+      } catch (error) {
+        reject(null);
+      }
+    });
+  }
+  createGroup(group: GroupType): Promise<GroupType> {
+    const that = this;
+    const me = that.apiUsers.currentUser;
+
+    const addNewGroup = (data: GroupType, resolve, reject) => {
+      const groupsCollection = firestore().collection("groups");
+      const newGroup = groupsCollection.doc();
+      const completeCreation = async () => {
+        await that.addMeToGroupUsers(me, newGroup.id);
+        await that.addChannelToMyGroup(me, newGroup.id, "General");
+        that.addGroupToMyGroups(
+          me,
+          newGroup.id,
+          (res) => {
+            if (res) {
+              resolve(data);
+              return;
+            }
+            reject(null);
+          },
+          (err) => {
+            console.log(TAG, err);
+            reject(err);
+          },
+        );
+      };
+      groupsCollection
+        .doc(newGroup.id)
+        .set(data)
+        .then(() => completeCreation())
+        .catch((err) => reject(err));
+    };
+    return new Promise<GroupType>((resolve, reject) => {
+      try {
+        const newGroup = new GroupType("", {
+          ...group,
+          admins: [me.id],
+          creationDate: utils.dates.dateNowUnix(),
+          creator: me.id,
+        });
+        addNewGroup(newGroup, resolve, reject);
       } catch (error) {
         reject(null);
       }

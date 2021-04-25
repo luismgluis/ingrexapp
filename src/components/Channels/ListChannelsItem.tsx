@@ -2,11 +2,14 @@ import { StyleSheet, View, Pressable } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, useTheme } from "@ui-kitten/components";
 import utils from "./../../libs/utils/utils";
-import { ChannelType } from "../../libs/types/ChannelType";
-import { ChannelsListItem } from "./ListChannels";
-import CameraIcon from "./../Icons/others/CameraICon";
+
 import MapIcon from "../Icons/Home/MapIcon";
+import AppIcon from "../Icons/AppIcon/AppIcon";
 import CButton from "../CButton/CButton";
+import { ChannelsListItem } from "../Home/HomeModule";
+import FormIcon from "../Icons/Home/FormIcon";
+import AddICon from "../Icons/Home/AddIcon";
+
 const styles = StyleSheet.create({
   itemBox: {
     paddingHorizontal: 5,
@@ -41,6 +44,7 @@ const ListChannelItem: React.FC<ListChannelItemProps> = ({
     stylesBox.borderBottomWidth = 3;
     stylesBox.borderBottomColor = theme["color-primary-600"];
   }
+
   return (
     <View key={utils.generateKey("channelItem")} style={stylesBox}>
       {visible && (
@@ -49,11 +53,29 @@ const ListChannelItem: React.FC<ListChannelItemProps> = ({
             <CButton
               onPress={pressItem}
               imageInsertComponent={() => (
-                <MapIcon
-                  color={theme["color-primary-500"]}
-                  width={35}
-                  height={35}
-                />
+                <>
+                  {listItem.module === "access" && (
+                    <AppIcon
+                      color={theme["color-primary-500"]}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                  {listItem.module === "history" && (
+                    <FormIcon
+                      color={theme["color-primary-500"]}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                  {listItem.module === "register" && (
+                    <AddICon
+                      color={theme["color-primary-500"]}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                </>
               )}
             />
           )}

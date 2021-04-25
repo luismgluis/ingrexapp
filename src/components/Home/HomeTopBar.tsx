@@ -1,4 +1,4 @@
-import { Button, StyleSheet, View } from "react-native";
+import { Button, Pressable, StyleSheet, View } from "react-native";
 import React from "react";
 import CButton from "../CButton/CButton";
 import Panel from "../Panel/Panel";
@@ -22,7 +22,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     flexDirection: "row-reverse",
   },
+  titlePanel: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   titleText: { textAlign: "center" },
+  panelGroupName: {
+    justifyContent: "center",
+    height: "100%",
+  },
   paper: {
     flex: 12,
     flexDirection: "column",
@@ -31,42 +39,27 @@ const styles = StyleSheet.create({
 const TAG = "HOME TOP BAR";
 type HomeTopBarProps = {
   gropSelected: GroupType;
+  onGroupPress: () => void;
 };
-const HomeTopBar: React.FC<HomeTopBarProps> = ({ gropSelected }) => {
+const HomeTopBar: React.FC<HomeTopBarProps> = ({
+  gropSelected,
+  onGroupPress,
+}) => {
   const theme = useTheme();
+  console.log(TAG, "gropSelected", gropSelected);
   return (
     <Panel style={styles.titleContainer} level="6">
-      <Text style={styles.titleText} category="h3">
-        {"EnRed"}
-        <Text category="h6">
-          {gropSelected.name !== "" && " - " + gropSelected.name}
+      <View style={styles.titlePanel}>
+        <Text style={styles.titleText} category="h3">
+          {" Accessa"}
         </Text>
-      </Text>
-
+        <Pressable style={styles.panelGroupName} onPress={onGroupPress}>
+          <Text category="h6">
+            {gropSelected.name !== "" && " - " + gropSelected.name}
+          </Text>
+        </Pressable>
+      </View>
       <View style={styles.panelRight}>
-        {/*<View>
-          <CButton
-            imageInsertComponent={() => (
-              <>
-                {pageSelected === 0 && (
-                  <MapIcon
-                    color={theme["color-primary-500"]}
-                    width={35}
-                    height={35}
-                  />
-                )}
-                {pageSelected === 1 && (
-                  <ChatIcon
-                    color={theme["color-primary-500"]}
-                    width={35}
-                    height={35}
-                  />
-                )}
-              </>
-            )}
-            onPress={() => null}
-          />
-        </View> */}
         <View>
           <CButton
             imageInsertComponent={() => (

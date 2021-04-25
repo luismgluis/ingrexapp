@@ -130,6 +130,9 @@ const CAlert: React.FC<CAlertProps> = ({
     }
   }, [scrollDown, scrollDownFn]);
 
+  const closeOutSide = () => {
+    onClose();
+  };
   const anim = VisibleAnim(1000, 0);
   const containerStyles = { opacity: anim };
   return (
@@ -140,7 +143,7 @@ const CAlert: React.FC<CAlertProps> = ({
             ref={scrollRef}
             style={styles.scroll}
             onScroll={(e) => setScrollHeight(e.nativeEvent.contentOffset.y)}>
-            <Pressable onPress={onClose}>
+            <Pressable onPress={closeOutSide}>
               <Panel style={styles.panelTop} totalHeight={totalHeight * 0.5} />
             </Pressable>
             <Panel style={panelStyles}>

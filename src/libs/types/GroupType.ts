@@ -15,4 +15,10 @@ export default class GroupType {
     this.name = data.name || "";
     this.public = data.public || false;
   }
+  isEmpty(): boolean {
+    if (this.id === "") {
+      return true;
+    }
+    return false;
+  }
 }

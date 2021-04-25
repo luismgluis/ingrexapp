@@ -40,7 +40,7 @@ export const CAlertQuestion = (
     return (
       <CAlert
         canOutsideClose={canOutsideClose}
-        onClose={moduleAlert.close}
+        onClose={() => moduleAlert.close()}
         scrollDown={200}>
         <Panel totalHeight={"80%"} paddingVertical={30} verticalCenter={true}>
           <Text style={styles.textAction} category="h4">
@@ -78,10 +78,10 @@ export const CAlertQuestion = (
   };
   const jsx = <JsxCom />;
 
-  moduleAlert.setValue(jsx);
+  moduleAlert.setChild(jsx);
   return {
     show: () => {
-      moduleAlert.setValue(jsx);
+      moduleAlert.setChild(jsx);
     },
     close: () => {
       if (onClose) onClose();
@@ -110,10 +110,10 @@ export const CAlertEmpty = (
   };
   const jsx = <JsxCom />;
 
-  moduleAlert.setValue(jsx);
+  moduleAlert.setChild(jsx);
   return {
     show: () => {
-      moduleAlert.setValue(jsx);
+      moduleAlert.setChild(jsx);
     },
     close: () => {
       if (onClose) onClose();
