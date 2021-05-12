@@ -17,14 +17,12 @@ type LoadingScreenProps = {
 };
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ title, subTitle }) => {
   return (
-    <Panel totalHeight={0}>
-      <Panel verticalCenter={true}>
-        <Text category="h3">{title}</Text>
-        <View style={styles.spinner}>
-          <Spinner size="giant" />
-        </View>
-        <Text category="s1"> {subTitle}</Text>
-      </Panel>
+    <Panel verticalCenter={true} horizontalCenter={true} totalHeight={0}>
+      <Text category="h3">{title}</Text>
+      <View style={styles.spinner}>
+        <Spinner size="giant" />
+      </View>
+      <Text category="s1"> {subTitle}</Text>
     </Panel>
   );
 };

@@ -80,7 +80,7 @@ const MapScreen: React.FC<MapScreenProps> = ({ pagerFocus }) => {
   return (
     <View>
       <View style={containerStyles}>
-        <Panel verticalCenter={true}>
+        <Panel verticalCenter={true} horizontalCenter={true}>
           <View style={styles.bottomPanel}>
             <MapActions />
           </View>

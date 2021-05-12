@@ -38,7 +38,7 @@ const Album: React.FC<AlbumProps> = ({ navigation, route, callBack }) => {
   }, [callBack, refresh, mediaCounter]);
 
   return (
-    <Panel totalHeight={0}>
+    <Panel level="5" totalHeight={0}>
       <CTopBack title="Gallery" onBackPress={() => navigation.goBack()} />
       <FeedImages
         arrayImages={dataImages}

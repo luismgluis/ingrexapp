@@ -33,7 +33,7 @@ const JoinGroup: React.FC<JoinGroupProps> = ({ style, callBack }) => {
       });
   };
   return (
-    <Panel verticalCenter={true} paddingHorizontal={50}>
+    <Panel verticalCenter={true} horizontalCenter={true} paddingHorizontal={50}>
       <Text category="h3">Join a group</Text>
       <Text category="h6">write the group at</Text>
       <CInput

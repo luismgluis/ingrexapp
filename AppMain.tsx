@@ -27,7 +27,9 @@ export class AppMainModuleAlert {
     return this.closed;
   }
   close(): void {
-    this.setChild(null);
+    try {
+      this.setChild(null);
+    } catch (error) {}
   }
   setChild(newVal = null): void {
     if (newVal == null) {

@@ -1,3 +1,5 @@
+import utils from "../utils/utils";
+
 export default class GroupType {
   id: string;
   admins: string[];
@@ -13,7 +15,7 @@ export default class GroupType {
     this.creationDate = data.creationDate || 0;
     this.creator = data.creator || "";
     this.name = data.name || "";
-    this.public = data.public || false;
+    this.public = utils.objects.isEmpty(data.public) ? false : data.public;
   }
   isEmpty(): boolean {
     if (this.id === "") {

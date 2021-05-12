@@ -9,8 +9,6 @@ import CButton from "../CButton/CButton";
 import DoneDealIcon from "../Icons/others/DoneDealIcon";
 import TeamIcon from "../Icons/others/TeamIcon";
 import JoinGroup from "../Group/JoinGroup";
-import Panel from "../Panel/Panel";
-import CInput from "./../CInput/CInput";
 import CreateGroup from "../Group/CreateGroup";
 const TAG = "HOME MODULE";
 
@@ -29,28 +27,30 @@ export default class HomeModule {
     this.theme = theme;
     this.currentAlert = null;
   }
-  alertJoinToGroup(
-    callBack: (data: GroupType) => void,
-    firsTime: boolean,
-  ): void {
+  alertJoinToGroup(callBack: (data: GroupType) => void): void {
     const that = this;
-    const alert = CAlertQuestion(
-      "Hello",
-      firsTime
-        ? "it seems that you still do not belong to a group"
-        : "Do you want to change group?",
+    const alertIcon = (
       <TeamIcon
         width={150}
         height={150}
         color={that.theme["color-primary-500"]}
-      />,
+      />
+    );
+    const alert = CAlertQuestion(
+      "Hello",
+      "it seems that you still do not belong to a group",
+      alertIcon,
       {
         text: "Join a group",
         onPress: () => onPressJoin(),
       },
       {
         text: "Create group",
-        onPress: () => that.createGroup(callBack),
+        onPress: () =>
+          that.createGroup((data) => {
+            alert.close();
+            callBack(data);
+          }),
       },
       {
         text: "Back to login",
@@ -60,7 +60,60 @@ export default class HomeModule {
         },
       },
       null,
-      firsTime,
+      false,
+    );
+    that.currentAlert = alert;
+    const onPressJoin = () => {
+      that.joinGroup((data) => {
+        if (data == null) {
+          callBack(null);
+          return;
+        }
+        that.confirmJoinToGroup(data, (res) => {
+          console.log(TAG, res);
+          if (res) callBack(data);
+          if (!res) {
+            alert.show();
+            that.currentAlert = alert;
+          }
+        });
+      });
+    };
+  }
+  alertChangeGroup(callBack: (data: GroupType) => void): void {
+    const that = this;
+    const iconAlert = (
+      <TeamIcon
+        width={150}
+        height={150}
+        color={that.theme["color-primary-500"]}
+      />
+    );
+    const alert = CAlertQuestion(
+      "Hello",
+      "Do you want to change group?",
+      iconAlert,
+      {
+        text: "Join a group",
+        onPress: () => onPressJoin(),
+      },
+      {
+        text: "Create group",
+        onPress: () =>
+          that.createGroup((data) => {
+            alert.close();
+            callBack(data);
+          }),
+      },
+      {
+        text: "Back to login",
+        onPress: () => {
+          api.logOut();
+          alert.close();
+        },
+      },
+      () => alert.close(),
+      true,
     );
     that.currentAlert = alert;
     const onPressJoin = () => {
@@ -126,7 +179,7 @@ export default class HomeModule {
     const that = this;
     const alert = CAlertEmpty(
       <>
-        <CreateGroup callBack={(data) => callBack(data)} />
+        <CreateGroup callBack={callBack} />
       </>,
     );
     that.currentAlert = alert;

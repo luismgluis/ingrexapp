@@ -1,3 +1,5 @@
+import utils from "../utils/utils";
+
 interface ChannelTypeType {
   id: string;
   name: string;
@@ -19,7 +21,9 @@ export class ChannelType {
     }
     this.id = id;
     this.name = data.name || "";
-    this.onlyAdmins = data.onlyAdmins || false;
+    this.onlyAdmins = utils.objects.isEmpty(data.onlyAdmins)
+      ? false
+      : data.onlyAdmins;
     this.creationDate = data.creationDate || [];
     this.creator = data.creator || "";
     this.chatRoomID = data.chatRoomID || "";

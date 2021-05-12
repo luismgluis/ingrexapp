@@ -1,3 +1,5 @@
+import utils from "../utils/utils";
+
 export default class RoomMessageType {
   id: string;
   creator: string;
@@ -23,10 +25,18 @@ export default class RoomMessageType {
     this.location = data.location || null;
     this.fileUrl = data.fileUrl || data.imageUrl || "";
     this.creationDate = data.creationDate || 0;
-    this.firstMessage = data.firstMessage || false;
-    this.lastMessage = data.lastMessage || false;
-    this.isVisibleMessage = data.isVisibleMessage || false;
-    this.fileUpload = data.fileUpload || data.imageUpload || true;
+    this.firstMessage = utils.objects.isEmpty(data.firstMessage)
+      ? false
+      : data.firstMessage;
+    this.lastMessage = utils.objects.isEmpty(data.lastMessage)
+      ? false
+      : data.lastMessage;
+    this.isVisibleMessage = utils.objects.isEmpty(data.isVisibleMessage)
+      ? false
+      : data.isVisibleMessage;
+    this.fileUpload = utils.objects.isEmpty(data.fileUpload)
+      ? false
+      : data.fileUpload;
     this.fileSize = data.fileSize || 0;
     this.fileTime = data.fileTime || 0;
     this.fileDimensions = data.fileDimensions || "";

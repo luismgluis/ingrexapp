@@ -4,6 +4,7 @@ import Panel from "../Panel/Panel";
 import { Text } from "@ui-kitten/components";
 import CInput from "../CInput/CInput";
 import UsersInfoListItem from "../UsersInfo/UsersInfoListItem";
+import { ResidentType } from "../../libs/types/ResidentType";
 
 const styles = StyleSheet.create({
   container: {},
@@ -21,6 +22,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 20,
   },
+  panelFlatList: { width: "90%" },
 });
 const TAG = "USERS HISTORY";
 type UsersHistoryProps = {
@@ -37,13 +39,11 @@ const UsersHistory: React.FC<UsersHistoryProps> = ({ pagerFocus }) => {
     return arr;
   }, []);
   const renderItem = useCallback((data) => {
-    console.log(TAG, data);
+    //console.log(TAG, data);
     return (
       <UsersInfoListItem
-        title="Luis Miguel Grajales"
-        description={`Access to F204 = ${data}`}
+        resident={new ResidentType("", {})}
         footerText="10/04/2021 13:50"
-        imageUri="https://firebasestorage.googleapis.com/v0/b/ingrex-app.appspot.com/o/others%2Fluismiguel_tatacoa.jpg?alt=media&token=d23abb8f-ea5a-4bab-9525-7c647a063079"
       />
     );
   }, []);
@@ -52,7 +52,7 @@ const UsersHistory: React.FC<UsersHistoryProps> = ({ pagerFocus }) => {
       <Panel style={styles.panelTitle} level="6">
         <Text category="h3">Access History</Text>
       </Panel>
-      <Panel>
+      <Panel style={styles.panelFlatList}>
         <FlatList
           contentContainerStyle={styles.flatList}
           data={usersHistoryList}
@@ -60,6 +60,7 @@ const UsersHistory: React.FC<UsersHistoryProps> = ({ pagerFocus }) => {
           keyExtractor={(item) => item.index}
           keyboardShouldPersistTaps="always"
           viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+          maxToRenderPerBatch={10}
         />
       </Panel>
     </Panel>

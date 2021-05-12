@@ -9,6 +9,10 @@ import NumbersIcon from "../Icons/UsersAccess/NumbersIcon";
 import LettersIcon from "../Icons/UsersAccess/LettersIcon";
 import { useTheme } from "@ui-kitten/components";
 import Panel from "../Panel/Panel";
+import CInput from "../CInput/CInput";
+import UserAccessSearch from "./UserAccessSearch";
+import { ResidentType } from "../../libs/types/ResidentType";
+import HomeSearchIcon from "../Icons/UsersAccess/HomeSearchIcon";
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -16,19 +20,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "center",
-    paddingVertical: 5,
+    paddingTop: 10,
   },
   panelOptionsButton: {
     flex: 1,
     height: 50,
     alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "white",
+    paddingBottom: 10,
   },
 });
-const TAG = "";
+const TAG = "USERS ACCESS TOP SEARCH";
+const ButtonOption = ({ onPress, selected = false, iconComponent }) => {
+  const theme = useTheme();
+  const buttonStyles = {
+    ...styles.panelOptionsButton,
+    borderBottomColor: theme["color-primary-600"],
+    borderBottomWidth: selected ? 3 : 0,
+  };
+  return (
+    <CButton
+      onPress={onPress}
+      style={buttonStyles}
+      imageInsertComponent={() => iconComponent}
+    />
+  );
+};
 type UsersAccessTopSearchProps = {
   style?: StyleProp<ViewStyle>;
+  onResult: (u: ResidentType) => void;
 };
-const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = (props) => {
+
+const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
+  style,
+  onResult,
+}) => {
   const theme = useTheme();
   const buttonsOptionsSize = 50;
 
@@ -37,50 +64,69 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = (props) => {
     ? RNCamera.Constants.FlashMode.torch
     : RNCamera.Constants.FlashMode.off;
 
-  const onSuccess = (data) => {
+  const [searchSelected, setSearchSelected] = useState("idCard");
+  const [idCard, setIdCard] = useState("");
+
+  const onSuccess = (data: ResidentType) => {
     console.log(TAG, data);
+    onResult(data);
     //callBack(data);
+  };
+  const onQRRead = (data) => {
+    console.log(TAG, data);
   };
   /**/
   return (
     <>
       <View style={styles.container}>
-        <QRCodeScanner
-          onRead={onSuccess}
-          flashMode={flashMode}
-          topContent={<Text>Scan.</Text>}
-        />
+        {searchSelected === "" ||
+          (searchSelected === "qr" && (
+            <QRCodeScanner
+              onRead={(e) => onQRRead(e.data)}
+              flashMode={flashMode}
+              topContent={<Text>Scan.</Text>}
+            />
+          ))}
+        {searchSelected === "idCard" && (
+          <UserAccessSearch onResult={onSuccess} inputType="idCard" />
+        )}
+        {searchSelected === "sector" && (
+          <UserAccessSearch onResult={onSuccess} inputType="sector" />
+        )}
       </View>
       <Panel style={styles.panelOptions} level="7">
-        <CButton
-          style={styles.panelOptionsButton}
-          imageInsertComponent={() => (
+        <ButtonOption
+          selected={searchSelected === "qr"}
+          iconComponent={
             <QrCodeIcon
               color={theme["color-primary-500"]}
               width={buttonsOptionsSize}
               height={buttonsOptionsSize}
             />
-          )}
+          }
+          onPress={() => setSearchSelected("qr")}
         />
-        <CButton
-          style={styles.panelOptionsButton}
-          imageInsertComponent={() => (
+        <ButtonOption
+          selected={searchSelected === "idCard"}
+          iconComponent={
             <NumbersIcon
               color={theme["color-primary-500"]}
               width={buttonsOptionsSize}
               height={buttonsOptionsSize}
             />
-          )}
+          }
+          onPress={() => setSearchSelected("idCard")}
         />
-        <CButton
-          style={styles.panelOptionsButton}
-          imageInsertComponent={() => (
-            <LettersIcon
+        <ButtonOption
+          selected={searchSelected === "sector"}
+          iconComponent={
+            <HomeSearchIcon
               color={theme["color-primary-500"]}
               width={buttonsOptionsSize}
               height={buttonsOptionsSize}
             />
-          )}
+          }
+          onPress={() => setSearchSelected("sector")}
         />
       </Panel>
     </>

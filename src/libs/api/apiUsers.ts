@@ -219,7 +219,12 @@ class ApiUsers {
           .update({ profileImage: uri });
       },
     );
-    return firestore().collection("users").doc(user.id).set(user);
+    const resultPromise = firestore()
+      .collection("users")
+      .doc(user.id)
+      .set(user);
+
+    return resultPromise;
   }
   onCurrentUserUpdate(onUpdate: (user: UserType) => void): () => void {
     const that = this;

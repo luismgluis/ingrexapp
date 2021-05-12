@@ -52,7 +52,7 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
     dimensions: "",
     uri: "",
   });
-  const onSelectPerfilImage = (data: FeedImageType) => {
+  const onSelectProfileImage = (data: FeedImageType) => {
     setProfileImage({
       uri: data.uri,
       dimensions: data.dimensions,
@@ -85,7 +85,7 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
       });
   };
   return (
-    <Panel totalHeight={0}>
+    <Panel level="5" totalHeight={0}>
       <CTopBack
         title="Create Account"
         onBackPress={() => navigation.goBack()}
@@ -100,7 +100,7 @@ const LoginCreateAccount: React.FC<LoginCreateAccountProps> = ({
         <PerfilAvatar
           imageUri={profileImage.uri}
           changeButtonEnabled={true}
-          onSelect={onSelectPerfilImage}
+          onSelect={onSelectProfileImage}
         />
         <CInput
           style={styles.input}

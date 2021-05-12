@@ -10,10 +10,15 @@ class ApiGroup {
   currentGroup: string;
   currentGroupData: GroupType;
   apiUsers: ApiUsers;
+  static instance: any;
   constructor() {
+    if (typeof ApiGroup.instance === "object") {
+      return ApiGroup.instance;
+    }
+    ApiGroup.instance = this;
     this.apiUsers = new ApiUsers();
     this.currentGroup = "";
-
+    this.currentGroupData = new GroupType("", {});
     /* */
   }
   getGroupByID(id: string): Promise<GroupType> {
@@ -250,6 +255,7 @@ class ApiGroup {
 
     return new Promise<boolean>((resolve, reject) => {
       try {
+        console.log(TAG, "joinGroup", groupID);
         that
           .getGroupByID(groupID)
           .then((group) => {
@@ -259,7 +265,10 @@ class ApiGroup {
                 .then(() =>
                   that.addGroupToMyGroups(me, groupID, resolve, reject),
                 )
-                .catch((err) => reject(err));
+                .catch((err) => {
+                  console.log(TAG, "fail to join group", err);
+                  reject(err);
+                });
               return;
             }
             reject(null);

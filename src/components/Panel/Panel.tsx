@@ -16,27 +16,30 @@ declare type LayoutStyledProps = Overwrite<
 
 export interface LayoutProps extends ViewProps, LayoutStyledProps {
   children?: React.ReactNode;
-  level?: "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+  level?: "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
   totalHeight?: number | string;
   verticalCenter?: boolean;
   horizontalCenter?: boolean;
   withScroll?: boolean;
   paddingVertical?: number;
   paddingHorizontal?: number;
+  flexDirection?: "row" | boolean;
+  flex?: number;
 }
 
 export declare type LayoutElement = React.ReactElement<LayoutProps>;
 
 const Panel: React.FC<LayoutProps> = ({
   children,
-  level = "5",
+  level = "0",
   style,
   paddingVertical = 0,
   paddingHorizontal = 0,
   totalHeight = -1,
   verticalCenter = false,
   horizontalCenter = false,
-
+  flexDirection = false,
+  flex = 0,
   withScroll = false,
 }) => {
   const [keyboardHeight] = useKeyboard();
@@ -58,7 +61,8 @@ const Panel: React.FC<LayoutProps> = ({
     return level;
   })();
   const customStyles = {
-    backgroundColor: theme[`background-${levelNum}00`],
+    backgroundColor:
+      levelNum !== "0" ? theme[`background-${levelNum}00`] : undefined,
     //totalhe
     height: undefined,
     //vertial
@@ -66,6 +70,7 @@ const Panel: React.FC<LayoutProps> = ({
     alignItems: undefined,
     flex: undefined,
     overflow: "hidden",
+    flexDirection: undefined,
   };
 
   if (totalHeight !== -1) {
@@ -88,6 +93,8 @@ const Panel: React.FC<LayoutProps> = ({
 
   if (verticalCenter) customStyles.justifyContent = "center";
   if (horizontalCenter) customStyles.alignItems = "center";
+  if (flexDirection !== false) customStyles.flexDirection = flexDirection;
+  if (flex !== 0) customStyles.flex = flex;
 
   const nstyles = {
     ...customStyles,

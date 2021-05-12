@@ -2,6 +2,7 @@ import { StyleSheet, View } from "react-native";
 import React, { useState } from "react";
 import FastImage from "react-native-fast-image";
 import { useTheme } from "@ui-kitten/components";
+import DogIcon from "./../Icons/others/DogIcon";
 
 const cicleRadius = 45;
 const styles = StyleSheet.create({
@@ -11,6 +12,7 @@ const styles = StyleSheet.create({
     borderRadius: cicleRadius,
     overflow: "hidden",
   },
+  totalPanel: { justifyContent: "center" },
   image: {
     width: cicleRadius,
     height: cicleRadius,
@@ -23,14 +25,25 @@ type CAvatarProps = {
   style?: any;
   size?: number;
 };
-const CAvatar: React.FC<CAvatarProps> = ({ urlImage, style, size = 45 }) => {
+const CAvatar: React.FC<CAvatarProps> = ({
+  urlImage: imageUri,
+  style,
+  size = 45,
+}) => {
   const theme = useTheme();
+  const [theImage, setTheImage] = useState(() => {
+    if (imageUri !== "" && imageUri.includes("http")) {
+      return imageUri;
+    }
+    return "";
+  });
   const containerStyles = {
     ...styles.container,
     ...style,
     width: size,
     height: size,
     borderRadius: size,
+    backgroudColor: theme["color-base-600"],
   };
   const imageStyles = {
     ...styles.image,
@@ -38,22 +51,28 @@ const CAvatar: React.FC<CAvatarProps> = ({ urlImage, style, size = 45 }) => {
     height: size,
   };
   return (
-    <View style={containerStyles}>
-      <FastImage
-        style={imageStyles}
-        source={{
-          uri: urlImage,
-          //headers: { Authorization: "someAuthToken" },
-          priority: FastImage.priority.normal,
-        }}
-        resizeMode={FastImage.resizeMode.cover}
-        onLoad={(data) => {
-          //
-        }}
-        onError={() => {
-          console.error(TAG, "err");
-        }}
-      />
+    <View style={styles.totalPanel}>
+      <View style={containerStyles}>
+        {theImage !== "" && (
+          <FastImage
+            style={imageStyles}
+            source={{
+              uri: imageUri,
+              //headers: { Authorization: "someAuthToken" },
+              priority: FastImage.priority.normal,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+            onLoad={(data) => {
+              //
+            }}
+            onError={() => {
+              console.error(TAG, "err");
+              setTheImage("");
+            }}
+          />
+        )}
+        {theImage === "" && <DogIcon width={size} height={size} />}
+      </View>
     </View>
   );
 };

@@ -36,7 +36,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({ style, callBack }) => {
       });
   }, [form, callBack]);
   return (
-    <Panel verticalCenter={true} paddingHorizontal={50}>
+    <Panel verticalCenter={true} horizontalCenter={true} paddingHorizontal={50}>
       <Text category="h3">Create new group</Text>
       <Text category="h6">Fill out the group information</Text>
       <CInput

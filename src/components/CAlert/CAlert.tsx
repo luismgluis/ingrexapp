@@ -7,6 +7,8 @@ import {
   ScrollView,
   Pressable,
   Animated,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Portal } from "react-native-portalize";
@@ -15,7 +17,7 @@ import utils from "../../libs/utils/utils";
 import { useSelector } from "react-redux";
 import LinearGradient from "react-native-linear-gradient";
 import BarsIcon from "../Icons/Alert/BarsIcon";
-import { useTheme } from "@ui-kitten/components";
+import { Text, useTheme } from "@ui-kitten/components";
 import { VisibleAnim } from "../../libs/anim/VisibleAnim";
 import { useKeyboard } from "../../libs/usekeyBoard/useKeyBoard";
 
@@ -77,9 +79,11 @@ const CAlert: React.FC<CAlertProps> = ({
   scrollDown = -1,
   style,
   children,
-  onClose,
+  canOutsideClose,
+  onClose = null,
 }) => {
   const scrollRef = useRef<ScrollView>();
+  const [alertOpacity, setAlertOpacity] = useState(0);
   const [keyBoardHeight] = useKeyboard();
   const [scrollHeight, setScrollHeight] = useState(0);
   const [generalValues, setGeneralValues] = useState({ keyBoardHeight: 0 });
@@ -95,7 +99,7 @@ const CAlert: React.FC<CAlertProps> = ({
 
   const scrollDownFn = useCallback(
     (distance = 0) => {
-      [0, 1, 2].forEach((val) => {
+      [1].forEach((val) => {
         utils.timeOut(100 * val).then(() => {
           if (distance === 0) {
             scrollRef.current?.scrollToEnd({ animated: true });
@@ -112,6 +116,10 @@ const CAlert: React.FC<CAlertProps> = ({
   );
 
   useEffect(() => {
+    Keyboard.dismiss();
+  }, []);
+
+  useEffect(() => {
     if (keyBoardHeight > 0 && generalValues.keyBoardHeight !== keyBoardHeight) {
       setGeneralValues({ keyBoardHeight: keyBoardHeight });
       const scrollH = scrollHeight > 0 ? scrollHeight : scrollDown;
@@ -125,28 +133,34 @@ const CAlert: React.FC<CAlertProps> = ({
   useEffect(() => {
     if (scrollDown > -1) {
       setTimeout(() => {
-        scrollDownFn(scrollDown);
-      }, 800);
+        scrollDownFn(scrollDown + 300);
+      }, 50);
     }
+    setTimeout(() => {
+      setAlertOpacity(1);
+    }, 50);
   }, [scrollDown, scrollDownFn]);
 
   const closeOutSide = () => {
-    onClose();
+    console.log(onClose);
+    if (!canOutsideClose) return;
+    if (onClose !== null) onClose();
   };
-  const anim = VisibleAnim(1000, 0);
-  const containerStyles = { opacity: anim };
+  //const anim = VisibleAnim(500, 0, false, 150);
+  //alertOpacity === 0 ? alertOpacity : anim
+  const containerStyles = { opacity: alertOpacity };
   return (
     <Portal>
       <AnimateView style={containerStyles}>
-        <Panel totalHeight={0} style={styles.container}>
+        <Panel level="5" totalHeight={0} style={styles.container}>
           <ScrollView
             ref={scrollRef}
             style={styles.scroll}
             onScroll={(e) => setScrollHeight(e.nativeEvent.contentOffset.y)}>
             <Pressable onPress={closeOutSide}>
-              <Panel style={styles.panelTop} totalHeight={totalHeight * 0.5} />
+              <Panel style={styles.panelTop} totalHeight={totalHeight * 0.1} />
             </Pressable>
-            <Panel style={panelStyles}>
+            <Panel level="5" style={panelStyles}>
               <View style={styles.panelBar}>
                 <BarsIcon
                   width={50}

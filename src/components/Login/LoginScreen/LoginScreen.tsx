@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   panelTitle: {
-    width: "100%",
     alignItems: "center",
+    height: 180,
   },
 });
 
@@ -71,11 +71,15 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation, route }) => {
   const goCreateAccount = () => {
     navigation.navigate("LoginCreateAccount");
   };
-  /**<Panel verticalCenter={true} totalHeight={"100%"}>
-        </Panel> */
+
   return (
     <>
-      <Panel verticalCenter={true} totalHeight={0} paddingHorizontal={50}>
+      <Panel
+        level="5"
+        verticalCenter={true}
+        horizontalCenter={true}
+        totalHeight={0}
+        paddingHorizontal={50}>
         <View style={styles.container}>
           <View style={styles.panelTitle}>
             <AppIcon style={styles.icon} width={100} height={100} />

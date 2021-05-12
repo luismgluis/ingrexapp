@@ -1,8 +1,10 @@
-import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet } from "react-native";
+import React, { useCallback, useState } from "react";
 import Panel from "../Panel/Panel";
 import UsersAccessTopSearch from "./UsersAccessTopSearch";
 import UsersAccessBottomInfo from "./UsersAccessBottomInfo";
+import { ResidentType } from "./../../libs/types/ResidentType";
+
 const styles = StyleSheet.create({
   container: {},
   title: { paddingTop: 20 },
@@ -23,11 +25,22 @@ type UsersAccessProps = {
   pagerFocus?: boolean;
 };
 const UsersAccess: React.FC<UsersAccessProps> = ({ pagerFocus }) => {
+  const [currentUser, setCurrentUser] = useState(new ResidentType("", {}));
+  const onClean = useCallback(() => {
+    setCurrentUser(new ResidentType("", {}));
+  }, []);
+  console.log(TAG, currentUser);
   return (
-    <Panel style={styles.container}>
-      <Panel totalHeight="50%">{pagerFocus && <UsersAccessTopSearch />}</Panel>
-      <Panel style={styles.panelOptions} level="6" totalHeight="30%">
-        <UsersAccessBottomInfo />
+    <Panel level="5" style={styles.container}>
+      <Panel totalHeight="40%">
+        {pagerFocus && (
+          <UsersAccessTopSearch onResult={(u) => setCurrentUser(u)} />
+        )}
+      </Panel>
+      <Panel style={styles.panelOptions} level="6" totalHeight="45%">
+        {!currentUser.isEmpty() && (
+          <UsersAccessBottomInfo onClean={onClean} userResident={currentUser} />
+        )}
       </Panel>
     </Panel>
   );

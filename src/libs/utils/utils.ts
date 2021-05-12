@@ -21,7 +21,7 @@ class Utils extends generalUtils {
     this.objects = new Objects();
     /* generateKey = (pre) => {
     return `${pre}_${new Date().getTime()}`;
-  };*/
+    };*/
   }
 
   getRandomNumber(min, max) {

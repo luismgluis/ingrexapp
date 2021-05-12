@@ -7,20 +7,21 @@ import TeamIcon from "../Icons/others/TeamIcon";
 import Panel from "../Panel/Panel";
 import CAlert from "./CAlert";
 import utils from "../../libs/utils/utils";
-
+import LoadingPanel from "./../LoadingPanel/LoadingPanel";
 const styles = StyleSheet.create({
   buttonAction: { marginTop: 30 },
   textAction: {
     textAlign: "center",
     paddingHorizontal: 30,
   },
+  textCenter: { textAlign: "center" },
 });
 export type CAlertButtonType = {
   text?: string;
   onPress: () => void;
 };
 
-type CAlertType = {
+export type CAlertType = {
   show: () => void;
   close: () => void;
 };
@@ -42,7 +43,11 @@ export const CAlertQuestion = (
         canOutsideClose={canOutsideClose}
         onClose={() => moduleAlert.close()}
         scrollDown={200}>
-        <Panel totalHeight={"80%"} paddingVertical={30} verticalCenter={true}>
+        <Panel
+          totalHeight={"80%"}
+          paddingVertical={30}
+          horizontalCenter={true}
+          verticalCenter={true}>
           <Text style={styles.textAction} category="h4">
             {title}
           </Text>
@@ -100,9 +105,15 @@ export const CAlertEmpty = (
     return (
       <CAlert
         canOutsideClose={canOutsideClose}
-        onClose={moduleAlert.close}
+        onClose={() => {
+          if (canOutsideClose) moduleAlert.close();
+        }}
         scrollDown={200}>
-        <Panel totalHeight={"80%"} paddingVertical={30} verticalCenter={true}>
+        <Panel
+          totalHeight={"80%"}
+          paddingVertical={30}
+          horizontalCenter={true}
+          verticalCenter={true}>
           {child}
         </Panel>
       </CAlert>
@@ -111,13 +122,54 @@ export const CAlertEmpty = (
   const jsx = <JsxCom />;
 
   moduleAlert.setChild(jsx);
+  let isClosed = false;
   return {
     show: () => {
+      isClosed = false;
       moduleAlert.setChild(jsx);
     },
     close: () => {
+      if (isClosed) return;
+      isClosed = true;
       if (onClose) onClose();
       moduleAlert.close();
     },
   };
+};
+
+export const CAlertLoading = (title) => {
+  const comp = <LoadingPanel text={title} />;
+  return CAlertEmpty(comp, () => null, false);
+};
+
+export const CAlertInfo = (title, text) => {
+  let alert = null;
+  const comp = (
+    <Panel verticalCenter={true}>
+      <Panel paddingVertical={10}>
+        <Text style={styles.textCenter} category="h2">
+          {title}
+        </Text>
+      </Panel>
+      <Text style={styles.textCenter} category="h6">
+        {text}
+      </Text>
+      <CButton
+        onPress={() => alert.close()}
+        paddingHorizontal={20}
+        paddingVertical={30}
+        text="Ok"
+      />
+    </Panel>
+  );
+
+  const nalert = CAlertEmpty(
+    comp,
+    () => {
+      nalert.close();
+    },
+    true,
+  );
+  alert = nalert;
+  return nalert;
 };

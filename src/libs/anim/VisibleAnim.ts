@@ -5,6 +5,7 @@ export function VisibleAnim(
   duration = 500,
   intialVal = 0,
   loop = false,
+  delay = 0,
 ): Animated.Value {
   const initAnim = useRef(new Animated.Value(intialVal)).current;
   useEffect(() => {
@@ -26,7 +27,13 @@ export function VisibleAnim(
         animation(1);
       });
     };
-    animation(intialVal === 0 ? 1 : 0);
+    //animation(intialVal === 0 ? 1 : 0);
+    if (delay === 0) animation(1);
+    if (delay > 0) {
+      setTimeout(() => {
+        animation(1);
+      }, delay);
+    }
     if (!loop) {
       blockAnimation = true;
     }
@@ -34,8 +41,9 @@ export function VisibleAnim(
       blockAnimation = true;
     };
     //Animated.loop(a, { iterations: 10000 }).start();
-  }, [duration, initAnim, intialVal, loop]);
+  }, [duration, initAnim, intialVal, loop, delay]);
 
+  //console.log(initAnim);
   return initAnim;
 }
 

@@ -37,7 +37,7 @@ type HomeProps = {
   navigation: any;
   route: any;
 };
-
+let rendercounter = 0;
 const Home: React.FC<HomeProps> = ({ navigation, route }) => {
   useFocusEffect(
     CustomBackHandler(() => {
@@ -67,13 +67,22 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
 
   const selectGroup = useCallback(
     (firsTime: boolean) => {
-      module.alertJoinToGroup((data) => {
-        console.log(TAG, "data", data);
-        if (data !== null) {
-          dispatch(setCurrentReduxGroup(data));
+      if (firsTime) {
+        module.alertJoinToGroup((newGroup) => {
+          console.log(TAG, "data", newGroup);
+          if (newGroup !== null) {
+            dispatch(setCurrentReduxGroup(newGroup));
+            setCFORCE(CFORCE + 1);
+          }
+        });
+        return;
+      }
+      module.alertChangeGroup((newGroup) => {
+        if (newGroup !== null) {
+          dispatch(setCurrentReduxGroup(newGroup));
+          setCFORCE(CFORCE + 1);
         }
-        setCFORCE(CFORCE + 1);
-      }, firsTime);
+      });
     },
     [module, CFORCE, dispatch],
   );
@@ -91,7 +100,7 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
 
   useEffect(() => {
     const onLoadChannels = (channelsLoaded: ChannelsListItem[]) => {
-      if (currentGroup.isEmpty()) {
+      if (currentGroup.isEmpty() && !api.group.currentGroupData.isEmpty()) {
         dispatch(setCurrentReduxGroup(api.group.currentGroupData));
       }
       if (channelsLoaded.length === 0) {
@@ -102,16 +111,25 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
       setChannelsListItems(channelsLoaded);
     };
     if (CFORCE >= 0) module.getChannels((data) => onLoadChannels(data));
-  }, [withoutGroups, module, CFORCE, dispatch, currentGroup]);
+  }, [module, CFORCE, dispatch, currentGroup]);
 
   const onChangeListChannels = useCallback((listItem: ChannelsListItem) => {
     pagerViewRef.current?.setPage(listItem.index);
     setSelectedIndexPage(listItem.index);
   }, []);
 
-  console.log(TAG, "selectedIndexPage", selectedIndexPage);
+  console.log(
+    TAG,
+    "selectedIndexPage",
+    selectedIndexPage,
+    "rendercounter:",
+    rendercounter++,
+  );
   return (
-    <Panel key={"GroupHomeKey" + currentGroup.id} style={styles.paper}>
+    <Panel
+      level="5"
+      key={"GroupHomeKey" + currentGroup.id}
+      style={styles.paper}>
       <HomeTopBar
         onGroupPress={() => selectGroup(false)}
         gropSelected={currentGroup}
@@ -167,7 +185,7 @@ const Home: React.FC<HomeProps> = ({ navigation, route }) => {
         </PagerView>
       )}
       {withoutGroups && (
-        <Panel verticalCenter={true}>
+        <Panel verticalCenter={true} horizontalCenter={true}>
           <Text category="h3">Without group</Text>
         </Panel>
       )}

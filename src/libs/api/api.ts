@@ -8,6 +8,7 @@ import ApiRoom from "./apiRoom";
 import utils from "../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import playerSounds from "../utils/playerSounds";
+import { ApiResidents } from "./apiResidents";
 
 const TAG = "API";
 class Api {
@@ -16,6 +17,7 @@ class Api {
   users: ApiUsers;
   group: ApiGroup;
   room: ApiRoom;
+  residents: ApiResidents;
   currentPlayerSouds: playerSounds;
   static instance: any;
   constructor() {
@@ -27,6 +29,7 @@ class Api {
     this.group = new ApiGroup();
     this.storage = new ApiStorage();
     this.room = new ApiRoom();
+    this.residents = new ApiResidents();
     this.currentPlayerSouds = new playerSounds();
     return this;
   }
