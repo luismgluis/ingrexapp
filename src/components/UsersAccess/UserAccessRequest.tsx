@@ -1,17 +1,12 @@
-import {
-  StyleSheet,
-  View,
-  StyleProp,
-  ViewStyle,
-  Linking,
-  Platform,
-} from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, View, StyleProp, ViewStyle, Linking } from "react-native";
+import React, { useCallback, useState } from "react";
 import Panel from "../Panel/Panel";
 import { Text } from "@ui-kitten/components";
 import CButton from "../CButton/CButton";
 import { ResidentType } from "../../libs/types/ResidentType";
 import utils from "../../libs/utils/utils";
+import { UserAccessModule } from "./UserAccessModule";
+import UsersInfoListItem from "../UsersInfo/UsersInfoListItem";
 
 const styles = StyleSheet.create({
   container: {},
@@ -23,6 +18,13 @@ const styles = StyleSheet.create({
 });
 
 const TAG = "USER ACCESS REQUEST ACCESS";
+export type confirmationOptionsType = {
+  enabled: boolean;
+  typeAlert: "call" | "telegram";
+  message: string;
+  listener: () => void;
+  answer: "YES" | "NO" | null;
+};
 type UserAccessRequestProps = {
   style?: StyleProp<ViewStyle>;
   onConfirm: (result: boolean) => void;
@@ -35,44 +37,63 @@ const UserAccessRequest: React.FC<UserAccessRequestProps> = ({
   visitor,
   style,
 }) => {
-  const [confirmationSent, setConfirmationSent] = useState(false);
-  const openTelegram = () => {
-    setConfirmationSent(true);
-    //https://t.me/luismigraja?text=hola
-    // whatsapp://send?phone=573166478046&text=hola
-    const sp = Platform.OS === "ios" ? "&" : "?";
-    Linking.openURL("https://telegram.me/catmely?msj=Mi_mensaje");
-    //Linking.openURL(`tg://${resident.telegram}?text=Mi_mensaje`);
-  };
+  const [module, setModule] = useState(new UserAccessModule());
+  const [
+    confirmationOptions,
+    setConfirmationOptions,
+  ] = useState<confirmationOptionsType>({
+    enabled: false,
+    answer: null,
+    typeAlert: "telegram",
+    message: "",
+    listener: () => null,
+  });
+
+  const openTelegram = useCallback(() => {
+    setConfirmationOptions({
+      ...confirmationOptions,
+      message: "",
+      enabled: true,
+    });
+    module
+      .openTelegram(resident, visitor)
+      .then((res) => setConfirmationOptions(res))
+      .catch((err) => console.log(TAG, err));
+    //const sp = Platform.OS === "ios" ? "&" : "?";
+  }, [confirmationOptions, resident, visitor, module]);
+
   const openCallPhone = () => {
-    setConfirmationSent(true);
-    //https://t.me/luismigraja?text=hola
+    setConfirmationOptions({
+      ...confirmationOptions,
+      enabled: true,
+      typeAlert: "call",
+    });
     Linking.openURL(`tel:${resident.phone}`);
   };
+
   const styleContainer = {
     ...utils.objects.cloneObject(style),
     ...styles.container,
   };
   return (
-    <Panel totalHeight="70%" style={styleContainer}>
-      {!confirmationSent && (
-        <Panel>
+    <Panel width="100%" totalHeight="70%" style={styleContainer}>
+      {!confirmationOptions.enabled && (
+        <Panel width="100%">
           <Panel verticalCenter={true} paddingVertical={0}>
             <Text style={styles.title} category="h4">
               Select Channel
             </Text>
           </Panel>
-          <Panel verticalCenter={true} paddingVertical={15}>
-            <Text category="h5">
-              Now request the entrance of the visitor {visitor.name}
-            </Text>
-            <Text category="h6">
-              It will be requested from resident {resident.name}
-            </Text>
+          <Panel width="100%" paddingHorizontal={10} paddingVertical={15}>
+            <Text category="h5">Visitor</Text>
+            <UsersInfoListItem resident={visitor} />
+            <Text category="h5">Request permission to</Text>
+            <UsersInfoListItem resident={resident} />
           </Panel>
           <Panel flexDirection="row">
             <Panel flex={1}>
               <CButton
+                status="danger"
                 onPress={openCallPhone}
                 paddingHorizontal={20}
                 text="Call Phone"
@@ -90,25 +111,70 @@ const UserAccessRequest: React.FC<UserAccessRequestProps> = ({
           </Panel>
         </Panel>
       )}
-      {confirmationSent && (
+      {confirmationOptions.enabled && (
         <>
-          <Panel horizontalCenter={true} paddingVertical={50}>
-            <Text category="h4">Access was enabled?</Text>
-          </Panel>
-          <View style={styles.panelButtons}>
-            <Panel flex={1}>
-              <CButton
-                paddingHorizontal={20}
-                onPress={() => onConfirm(true)}
-                text="Yes"
-              />
+          {confirmationOptions.typeAlert === "call" && (
+            <View>
+              <Panel horizontalCenter={true} paddingVertical={50}>
+                <Text category="h4">Access was enabled?</Text>
+              </Panel>
+              <View style={styles.panelButtons}>
+                <Panel flex={1}>
+                  <CButton
+                    paddingHorizontal={20}
+                    onPress={() => onConfirm(true)}
+                    text="Yes"
+                  />
+                </Panel>
+                <Panel flex={1}>
+                  <CButton
+                    status="danger"
+                    paddingHorizontal={20}
+                    onPress={() => {
+                      onConfirm(false);
+                    }}
+                    text="Not"
+                  />
+                </Panel>
+              </View>
+            </View>
+          )}
+          {confirmationOptions.typeAlert === "telegram" && (
+            <Panel horizontalCenter={true}>
+              {confirmationOptions.message !== "" && (
+                <Text category="h3">{confirmationOptions.message}</Text>
+              )}
+              {confirmationOptions.message === "" && (
+                <Text category="h3">Esperando respuesta...</Text>
+              )}
             </Panel>
+          )}
+          <View>
             <Panel flex={1}>
-              <CButton
-                paddingHorizontal={20}
-                onPress={() => onConfirm(false)}
-                text="Not"
-              />
+              {confirmationOptions.answer == null ||
+                (confirmationOptions.answer === "NO" && (
+                  <CButton
+                    status="danger"
+                    paddingVertical={30}
+                    paddingHorizontal={80}
+                    onPress={() =>
+                      setConfirmationOptions({
+                        ...confirmationOptions,
+                        message: "",
+                        enabled: false,
+                      })
+                    }
+                    text="Cancel"
+                  />
+                ))}
+              {confirmationOptions.answer === "YES" && (
+                <CButton
+                  paddingVertical={30}
+                  paddingHorizontal={80}
+                  onPress={() => onConfirm(true)}
+                  text="Entrar"
+                />
+              )}
             </Panel>
           </View>
         </>

@@ -6,7 +6,7 @@ import {
   ViewStyle,
 } from "react-native";
 import React from "react";
-import { Button } from "@ui-kitten/components";
+import { Button, ButtonProps } from "@ui-kitten/components";
 import utils from "../../libs/utils/utils";
 
 const styles = StyleSheet.create({
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 const TAG = "CUSTOM BUTTON";
-type CButtonProps = {
+interface CButtonProps extends ButtonProps {
   text?: string;
   appeareance?: "outline" | "ghost";
   style?: StyleProp<ViewStyle>;
@@ -29,7 +29,7 @@ type CButtonProps = {
   imageInsertComponent?: React.FC;
   paddingVertical?: number;
   paddingHorizontal?: number;
-};
+}
 const CButton: React.FC<CButtonProps> = ({
   text,
   onPress,
@@ -38,6 +38,7 @@ const CButton: React.FC<CButtonProps> = ({
   imageInsertComponent,
   paddingVertical = 0,
   paddingHorizontal = 0,
+  status,
 }) => {
   const boxStyles = (() => {
     if (imageInsertComponent) {
@@ -59,6 +60,7 @@ const CButton: React.FC<CButtonProps> = ({
       {!imageInsertComponent && (
         <View style={boxStyles}>
           <Button
+            status={status}
             onPress={onPress}
             style={styles.button}
             appearance={appeareance}>

@@ -4,7 +4,15 @@ import ApiGroup from "./apiGroups";
 import { ResidentAccess } from "./../types/ResidentType";
 import ApiStorage from "./apiStorage";
 import utils from "../utils/utils";
+import axios from "axios";
+import { TelegramUsersReplies } from "../types/TelegramUsers";
 const TAG = "API RESIDENTS";
+
+export type callBackStop = {
+  setCallBack: (callBack: (result: TelegramUsersReplies) => void) => void;
+  stopListener: () => void;
+};
+
 export class ApiResidents {
   group: ApiGroup;
   storage: ApiStorage;
@@ -12,6 +20,120 @@ export class ApiResidents {
     this.storage = new ApiStorage();
     this.group = new ApiGroup();
     //
+  }
+  getTelegram(resi: ResidentType): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      try {
+        firestore()
+          .collection("telegram_users")
+          .where("sector", "==", resi.sector)
+          .where("idCard", "==", resi.idCard)
+          .limit(1)
+          .get()
+          .then((data) => {
+            console.log(TAG, data);
+            const arrData = [];
+            data.forEach((doc) => {
+              console.log(TAG, doc.data());
+              const telegramInfo = {
+                ...doc.data(),
+                id: doc.id,
+              };
+              arrData.push(telegramInfo);
+            });
+            if (arrData.length > 0) {
+              resolve(arrData[0]);
+              return;
+            }
+            reject(null);
+          })
+          .catch((err) => {
+            console.log(TAG, err);
+            reject(null);
+          });
+      } catch (error) {
+        reject(null);
+      }
+    });
+  }
+  sendTelegramMessage(
+    resi: ResidentType,
+    msj: string,
+    replyOptions: Array<string>,
+  ): Promise<callBackStop> {
+    const that = this;
+    let telegramInfo = <any>{};
+    const arrReplyOptions = replyOptions
+      .map((item) => item.replace("|", ","))
+      .join("|");
+    const goodReply = () => {
+      let customCallBack = (reply: TelegramUsersReplies) => null;
+      const onResult = (result) => {
+        const data = result.data();
+        customCallBack(data);
+      };
+      const onError = () => {
+        customCallBack(null);
+      };
+      const listener = firestore()
+        .collection("telegram_users_replies")
+        .doc(telegramInfo.id)
+        .onSnapshot(onResult, onError);
+
+      return {
+        setCallBack: (callBackfun) => {
+          customCallBack = callBackfun;
+        },
+        stopListener: () => {
+          listener();
+          //
+        },
+      };
+    };
+    const sendMsj = (resolve: (res: callBackStop) => void, reject) => {
+      console.log(TAG, true);
+      axios
+        .post(
+          "https://us-east1-accessatelegrambot1.cloudfunctions.net/sendBotMessage",
+          {
+            message: msj,
+            idTelegramUser: telegramInfo.id,
+            pendingResponse: "true",
+            replyOptions: arrReplyOptions,
+          },
+          {
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            responseType: "json",
+          },
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            const data = res.data;
+            if (data.result === "OK") {
+              resolve(goodReply());
+            }
+          }
+          reject(null);
+        })
+        .catch((err) => {
+          console.log(TAG, " reject ", err);
+          reject(null);
+        });
+    };
+
+    return new Promise<callBackStop>(async (resolve, reject) => {
+      try {
+        const idTelegramUser = await that.getTelegram(resi).catch(() => null);
+        if (idTelegramUser) {
+          telegramInfo = idTelegramUser;
+          sendMsj(resolve, reject);
+          return;
+        }
+        reject(null);
+      } catch (error) {
+        reject(null);
+      }
+    });
   }
   saveResident(resi: ResidentType): Promise<string> {
     //
@@ -76,11 +198,12 @@ export class ApiResidents {
               data.forEach((doc) => {
                 result.push(new ResidentType(doc.id, doc.data()));
               });
+              console.log(TAG, result);
               if (result.length > 0) {
                 resolve(result);
                 return;
               }
-              reject(null);
+              resolve([]);
             })
             .catch((error) => {
               reject(error);
@@ -117,7 +240,7 @@ export class ApiResidents {
               resolve(result);
               return;
             }
-            reject(null);
+            resolve([]);
           })
           .catch((error) => {
             console.log(TAG, error);

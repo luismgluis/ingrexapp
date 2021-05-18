@@ -74,20 +74,22 @@ const UsersInfoListItem: React.FC<UsersInfoProps> = ({
           {footerText !== "" && <Text category="label">{footerText}</Text>}
         </Panel>
       </Panel>
-      <Panel paddingHorizontal={10} level="7" style={styles.buttonPanel}>
-        <CButton
-          onPress={() => {
-            if (onPress) onPress(resident);
-          }}
-          imageInsertComponent={() => (
-            <CheckIcon
-              color={theme["color-primary-500"]}
-              width={30}
-              height={30}
-            />
-          )}
-        />
-      </Panel>
+      {onPress !== null && (
+        <Panel paddingHorizontal={10} level="7" style={styles.buttonPanel}>
+          <CButton
+            onPress={() => {
+              if (onPress) onPress(resident);
+            }}
+            imageInsertComponent={() => (
+              <CheckIcon
+                color={theme["color-primary-500"]}
+                width={30}
+                height={30}
+              />
+            )}
+          />
+        </Panel>
+      )}
     </Panel>
   );
 };

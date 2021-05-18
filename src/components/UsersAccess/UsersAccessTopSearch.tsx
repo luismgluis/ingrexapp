@@ -6,11 +6,11 @@ import QRCodeScanner from "react-native-qrcode-scanner";
 import { RNCamera } from "react-native-camera";
 import QrCodeIcon from "../Icons/UsersAccess/QrCodeIcon";
 import NumbersIcon from "../Icons/UsersAccess/NumbersIcon";
-import LettersIcon from "../Icons/UsersAccess/LettersIcon";
+
 import { useTheme } from "@ui-kitten/components";
 import Panel from "../Panel/Panel";
-import CInput from "../CInput/CInput";
-import UserAccessSearch from "./UserAccessSearch";
+
+import UserAccessSearch from "./UserAccessSearch/UserAccessSearch";
 import { ResidentType } from "../../libs/types/ResidentType";
 import HomeSearchIcon from "../Icons/UsersAccess/HomeSearchIcon";
 

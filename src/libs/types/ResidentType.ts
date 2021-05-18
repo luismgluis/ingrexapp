@@ -1,6 +1,7 @@
 import api from "../api/api";
 import utils from "../utils/utils";
 
+const TAG = "RESIDENT TYPE";
 type OptionalDataItem = {
   name: string;
   value: string;
@@ -31,6 +32,16 @@ export class ResidentAccess implements ResidentAccessType {
     this.sector = data.sector || "";
     this.validatorID = data.validatorID || "";
     this.exit = utils.objects.isEmpty(data.exit) ? false : data.exit;
+  }
+  isEmpty(): boolean {
+    console.log(TAG, this.id);
+    if (typeof this.id === "undefined") {
+      return true;
+    }
+    if (this.id !== "" && this.creationDate !== 0) {
+      return false;
+    }
+    return true;
   }
   exportToUpload(): ResidentAccessType {
     return {
@@ -107,6 +118,7 @@ export class ResidentType implements ResidentTypeType {
         api.residents
           .getLastAccess(that)
           .then((data) => {
+            console.log(TAG, data);
             if (data.length > 0) resolve(data[0]);
             if (!(data.length > 0)) reject(null);
           })

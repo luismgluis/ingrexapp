@@ -105,8 +105,9 @@ export default class RoomMessageType {
         fileUrl: this.fileUrl,
         type: this.type,
         creationDate: this.creationDate,
-        fileTime: this.fileTime,
+        fileUpload: this.fileUpload,
         fileSize: this.fileSize,
+        fileTime: this.fileTime,
         fileDimensions: this.fileDimensions,
       };
     }

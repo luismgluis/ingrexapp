@@ -29,7 +29,7 @@ const UsersAccess: React.FC<UsersAccessProps> = ({ pagerFocus }) => {
   const onClean = useCallback(() => {
     setCurrentUser(new ResidentType("", {}));
   }, []);
-  console.log(TAG, currentUser);
+
   return (
     <Panel level="5" style={styles.container}>
       <Panel totalHeight="40%">

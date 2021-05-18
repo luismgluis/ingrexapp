@@ -1,18 +1,20 @@
 import { StyleSheet, View, TextInput } from "react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme, Text } from "@ui-kitten/components";
-import SearchIcon from "../Icons/UsersAccess/SearchIcon";
-import { ResidentType } from "../../libs/types/ResidentType";
-import { UserAccessModule } from "./UserAccessModule";
-import CButton from "../CButton/CButton";
+import SearchIcon from "../../Icons/UsersAccess/SearchIcon";
+import { ResidentType } from "../../../libs/types/ResidentType";
+import UserAccessSearchModule from "../UserAccessSearch/UserAccessSearchModule";
+import CButton from "../../CButton/CButton";
 import {
   CAlertEmpty,
   CAlertInfo,
   CAlertLoading,
-} from "../CAlert/CAlertNotification";
-import CloseIcon from "../Icons/others/CloseIcon";
-import UsersInfoListItem from "../UsersInfo/UsersInfoListItem";
-import Panel from "../Panel/Panel";
+} from "../../CAlert/CAlertNotification";
+import CloseIcon from "../../Icons/others/CloseIcon";
+import UsersInfoListItem from "../../UsersInfo/UsersInfoListItem";
+import Panel from "../../Panel/Panel";
+import utils from "../../../libs/utils/utils";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -43,11 +45,13 @@ const styles = StyleSheet.create({
 });
 
 const TAG = "USER ACCESS SEARCH";
-const module = new UserAccessModule();
+const module = new UserAccessSearchModule();
+
 type UserAccessSearchProps = {
   onResult?: (data: ResidentType) => void;
   inputType: "idCard" | "sector";
 };
+
 const UserAccessSearch: React.FC<UserAccessSearchProps> = ({
   onResult,
   inputType,
@@ -69,7 +73,7 @@ const UserAccessSearch: React.FC<UserAccessSearchProps> = ({
     return info;
   }, [inputType]);
 
-  const [valueToSearch, setValueToSearch] = useState("F204");
+  const [valueToSearch, setValueToSearch] = useState("");
   const inputStyles = {
     ...styles.input,
     color: theme["color-primary-700"],
@@ -88,7 +92,11 @@ const UserAccessSearch: React.FC<UserAccessSearchProps> = ({
         onResult(resi);
       };
       const elements = users.map((user) => (
-        <UsersInfoListItem onPress={onPress} resident={user} />
+        <UsersInfoListItem
+          key={utils.generateKey(`UIL${user.id}`)}
+          onPress={onPress}
+          resident={user}
+        />
       ));
 
       const alert = CAlertEmpty(
@@ -108,49 +116,93 @@ const UserAccessSearch: React.FC<UserAccessSearchProps> = ({
     [onResult],
   );
 
-  const search = useCallback(() => {
-    const loadingAlert = CAlertLoading("Searching..");
-    if (inputType === "idCard") {
-      module
-        .getUsersByIdCard(valueToSearch.toUpperCase())
-        .then((res) => {
-          console.log(TAG, res);
-          onResult(res);
-          loadingAlert.close();
-        })
-        .catch((err) => {
-          console.log(TAG, err);
-          loadingAlert.close();
-          CAlertInfo("Search fail", "No results found");
-        });
-    } else if (inputType === "sector") {
-      const onGetUsers = (users: ResidentType[]) => {
-        loadingAlert.close();
-        if (users.length > 0) {
-          selectUserInSector(users);
-          return;
-        }
-        CAlertInfo(
-          "Search failed",
-          users == null ? "search failed, try again" : "No results found",
-        );
-      };
-      module
-        .getUsersBySector(valueToSearch.toUpperCase())
-        .then((users) => {
-          setTimeout(() => {
-            onGetUsers(users);
-          }, 700);
-        })
-        .catch((err) => {
-          console.log(TAG, err);
-          setTimeout(() => {
-            onGetUsers(err ? err : null);
-          }, 700);
-        });
-    }
-  }, [valueToSearch, onResult, inputType, selectUserInSector]);
+  const [recents, setRecents] = useState([]);
 
+  const search = useCallback(
+    (customValueToSearch = "") => {
+      const valueSearch =
+        customValueToSearch !== "" ? customValueToSearch : valueToSearch;
+
+      const loadingAlert = CAlertLoading("Searching..");
+      let minTime = false;
+      utils.timeOut(700).then(() => (minTime = true));
+      if (inputType === "idCard") {
+        const onGetUser = (res) => {
+          if (res == null) {
+            CAlertInfo("Search fail", "No results found");
+            return;
+          }
+          loadingAlert.close();
+          onResult(res);
+        };
+        module
+          .getUsersByIdCard(valueSearch.toUpperCase())
+          .then((res) => {
+            console.log(TAG, res);
+            if (minTime) onGetUser(res);
+            if (!minTime) utils.timeOut(700).then(() => onGetUser(res));
+          })
+          .catch((err) => {
+            console.log(TAG, err);
+            if (minTime) onGetUser(null);
+            if (!minTime) utils.timeOut(700).then(() => onGetUser(null));
+          });
+      } else if (inputType === "sector") {
+        const onGetUsers = (users: ResidentType[]) => {
+          loadingAlert.close();
+          if (users !== null) {
+            if (users.length > 0) {
+              selectUserInSector(users);
+              return;
+            }
+          }
+          CAlertInfo(
+            "Search failed",
+            users == null ? "search failed, try again" : "No results found",
+          );
+        };
+
+        module
+          .getUsersBySector(valueSearch.toUpperCase())
+          .then((users) => {
+            module.addSectorRecents(valueSearch);
+            setRecents([]);
+            console.log(TAG, minTime, "getUsersBySector");
+            if (minTime) onGetUsers(users);
+            if (!minTime) utils.timeOut(700).then(() => onGetUsers(users));
+          })
+          .catch((err) => {
+            console.log(TAG, "getUsersBySector err", minTime, err);
+            if (minTime) onGetUsers(err);
+            if (!minTime) utils.timeOut(700).then(() => onGetUsers(err));
+          });
+      }
+    },
+    [valueToSearch, onResult, inputType, selectUserInSector],
+  );
+
+  useEffect(() => {
+    if (recents.length === 0 && inputType === "sector")
+      module.getSectorRecents().then((res) => setRecents(res));
+  }, [recents, inputType]);
+
+  const recentsJsx = useMemo(() => {
+    const arr = recents.map((item) => (
+      <View key={utils.generateKey(`RECENTBUTTONS${item}`)}>
+        <CButton
+          text={item}
+          appeareance="ghost"
+          onPress={() => {
+            setValueToSearch(item);
+            search(item);
+          }}
+        />
+      </View>
+    ));
+
+    console.log(TAG, recents, arr);
+    return arr;
+  }, [recents, search]);
   return (
     <View style={styles.container}>
       <View style={styles.panelInput}>
@@ -192,6 +244,9 @@ const UserAccessSearch: React.FC<UserAccessSearchProps> = ({
           </View>
         </View>
       </View>
+      <Panel flexDirection="row" totalHeight="50px">
+        {recentsJsx}
+      </Panel>
     </View>
   );
 };

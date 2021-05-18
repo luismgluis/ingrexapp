@@ -24,12 +24,6 @@ export default class playerSounds {
         return;
       }
       // loaded successfully
-      console.warn(
-        "duration in seconds: " +
-          boom.getDuration() +
-          "number of channels: " +
-          boom.getNumberOfChannels(),
-      );
 
       // Play the sound with an onEnd callback
       api.currentPlayerSouds.stop();

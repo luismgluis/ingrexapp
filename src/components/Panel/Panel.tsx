@@ -25,6 +25,7 @@ export interface LayoutProps extends ViewProps, LayoutStyledProps {
   paddingHorizontal?: number;
   flexDirection?: "row" | boolean;
   flex?: number;
+  width?: string;
 }
 
 export declare type LayoutElement = React.ReactElement<LayoutProps>;
@@ -41,6 +42,7 @@ const Panel: React.FC<LayoutProps> = ({
   flexDirection = false,
   flex = 0,
   withScroll = false,
+  width = "",
 }) => {
   const [keyboardHeight] = useKeyboard();
   const h: number = useSelector((store: any) => {
@@ -71,6 +73,7 @@ const Panel: React.FC<LayoutProps> = ({
     flex: undefined,
     overflow: "hidden",
     flexDirection: undefined,
+    width: undefined,
   };
 
   if (totalHeight !== -1) {
@@ -95,7 +98,7 @@ const Panel: React.FC<LayoutProps> = ({
   if (horizontalCenter) customStyles.alignItems = "center";
   if (flexDirection !== false) customStyles.flexDirection = flexDirection;
   if (flex !== 0) customStyles.flex = flex;
-
+  if (width !== "") customStyles.width = width;
   const nstyles = {
     ...customStyles,
     paddingVertical: paddingVertical,

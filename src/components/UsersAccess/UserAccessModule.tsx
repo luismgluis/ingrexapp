@@ -1,62 +1,29 @@
 import { Text } from "@ui-kitten/components";
-import React from "react";
+import React, { useMemo } from "react";
 import { ResidentType } from "../../libs/types/ResidentType";
+import utils from "../../libs/utils/utils";
 import {
   CAlertEmpty,
   CAlertInfo,
   CAlertLoading,
   CAlertType,
 } from "../CAlert/CAlertNotification";
+import CButton from "../CButton/CButton";
 import Panel from "../Panel/Panel";
 import api from "./../../libs/api/api";
-import UserAccessRequest from "./UserAccessRequest";
-import UserAccessSearch from "./UserAccessSearch";
+// eslint-disable-next-line object-curly-newline
+import UserAccessRequest, {
+  confirmationOptionsType,
+  // eslint-disable-next-line object-curly-newline
+} from "./UserAccessRequest";
+import UserAccessSearch from "./UserAccessSearch/UserAccessSearch";
+
+const TAG = "USER ACCESS MODULE";
 export class UserAccessModule {
   constructor() {
     //
   }
-  getUsersByIdCard(value: string): Promise<ResidentType> {
-    return new Promise<ResidentType>((resolve, reject) => {
-      try {
-        api.residents
-          .searchResident("idCard", value)
-          .then((data) => {
-            if (data.length > 0) {
-              resolve(data[0]);
-              return;
-            }
-            reject(null);
-          })
-          .catch((error) => {
-            console.log(error);
-            reject(error);
-          });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-  getUsersBySector(value: string): Promise<Array<ResidentType>> {
-    return new Promise<Array<ResidentType>>((resolve, reject) => {
-      try {
-        api.residents
-          .searchResident("sector", value)
-          .then((data) => {
-            if (data.length > 0) {
-              resolve(data);
-              return;
-            }
-            reject(null);
-          })
-          .catch((error) => {
-            console.log(error);
-            reject(error);
-          });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+
   saveExit(resident: ResidentType): CAlertType {
     if (resident.isEmpty()) return;
     const alertLoading = CAlertLoading("Registering output...");
@@ -131,22 +98,105 @@ export class UserAccessModule {
       );
     };
 
-    const alert = CAlertEmpty(
-      <Panel paddingVertical={50} totalHeight="80%">
-        <Panel totalHeight="100px" horizontalCenter={true}>
-          <Text category="h4">What is the destiny</Text>
+    const JsxCom: React.FC<any> = () => {
+      return (
+        <Panel paddingVertical={50} totalHeight="80%">
+          <Panel totalHeight="100px" horizontalCenter={true}>
+            <Text category="h4">What is the destiny</Text>
+          </Panel>
+          <Panel totalHeight="100px">
+            <UserAccessSearch
+              inputType="sector"
+              onResult={(res) => action(res)}
+            />
+          </Panel>
         </Panel>
-        <Panel totalHeight="100px">
-          <UserAccessSearch
-            inputType="sector"
-            onResult={(res) => action(res)}
-          />
-        </Panel>
-      </Panel>,
-      () => onConfirm(false),
-      true,
-    );
+      );
+    };
+
+    const alert = CAlertEmpty(<JsxCom />, () => onConfirm(false), true);
 
     return alert;
+  }
+  openTelegram(
+    resident: ResidentType,
+    visitor: ResidentType,
+  ): Promise<confirmationOptionsType> {
+    const msj = `Aviso de porteria❗️ ${visitor.name} esta en la entrada ¿Le dejas acceder?`;
+
+    const replyButtons = ["✅ Aceptar acceso", "❌ Rechazar acceso"];
+
+    const analiceReply = (reply: string) => {
+      const res = utils.analiceAnswerYesNo(reply);
+
+      let confirmationOptions: confirmationOptionsType = {
+        enabled: false,
+        answer: null,
+        typeAlert: "telegram",
+        message: "",
+        listener: () => null,
+      };
+      switch (res) {
+        case "YES":
+          confirmationOptions = {
+            ...confirmationOptions,
+            enabled: true,
+            message: "Acceso Concedido",
+          };
+          break;
+        case "NO":
+          confirmationOptions = {
+            ...confirmationOptions,
+            enabled: true,
+            message: "Acceso Denegado",
+          };
+        // eslint-disable-next-line no-fallthrough
+        default:
+          confirmationOptions = {
+            ...confirmationOptions,
+            enabled: true,
+            message: reply,
+          };
+          break;
+      }
+      confirmationOptions.answer = res;
+      return confirmationOptions;
+    };
+
+    const sendMsj = (resolve: (data) => void, reject) => {
+      api.residents
+        .sendTelegramMessage(resident, msj, replyButtons)
+        .then((result) => {
+          result.setCallBack((reply) => {
+            if (reply == null) {
+              reject(null);
+              return;
+            }
+            if (reply.reply === "") {
+              reject(null);
+              return;
+            }
+            const res = analiceReply(reply.reply);
+            resolve(res);
+            result.stopListener();
+          });
+        })
+        .catch((err) => {
+          console.log(TAG, err);
+          reject(null);
+          /*confirmationOptions = {
+            ...confirmationOptions,
+            enabled: true,
+            message: "Ocurrio un error" + err,
+          }; */
+        });
+    };
+    return new Promise<confirmationOptionsType>((resolve, reject) => {
+      try {
+        sendMsj(resolve, reject);
+      } catch (error) {
+        reject(null);
+      }
+    });
   }
 }

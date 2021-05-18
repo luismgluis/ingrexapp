@@ -1,8 +1,8 @@
 import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CButton from "../CButton/CButton";
 
-import { Avatar, Text, useTheme } from "@ui-kitten/components";
+import { Text, useTheme } from "@ui-kitten/components";
 import Panel from "../Panel/Panel";
 import UsersInfo from "../UsersInfo/UsersInfo";
 import { ResidentAccess, ResidentType } from "../../libs/types/ResidentType";
@@ -61,24 +61,29 @@ type UsersAccessTopSearchProps = {
   onClean: () => void;
 };
 const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
-  style,
   userResident,
   onClean,
 }) => {
-  const theme = useTheme();
   const [lastEntryInfo, setLastEntryInfo] = useState(
     new ResidentAccess("", {}),
   );
   const [lastEntryDate, setLastEntryDate] = useState("");
 
   useEffect(() => {
-    //if (!userResident.isVisitor) return;
-    userResident.getLastAccess().then((res) => {
-      console.log(TAG, res);
-      const d = utils.dates.unixToString(res.creationDate, true);
-      setLastEntryInfo(res);
-      setLastEntryDate(d);
-    });
+    console.log(TAG, "userResident get last access");
+    userResident
+      .getLastAccess()
+      .then((res) => {
+        console.log(TAG, res);
+        const d = utils.dates.unixToString(res.creationDate, true);
+        setLastEntryInfo(res);
+        setLastEntryDate(d);
+      })
+      .catch((err) => {
+        console.log(TAG, "get last access err", err);
+        setLastEntryInfo(new ResidentAccess("", {}));
+        setLastEntryDate("");
+      });
   }, [userResident]);
 
   const requestAccess = () => {
@@ -96,16 +101,29 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
     <Panel level="6" style={styles.container}>
       <UsersInfo style={styles.userInfoPanel} resident={userResident} />
       <Panel level="6" style={styles.lastAccessPanel}>
-        <View style={styles.panelSectorAction}>
-          <CustomText flex={1} title="Sector" value={lastEntryInfo.sector} />
-          <CustomText
-            flex={1}
-            title="Action"
-            value={lastEntryInfo.exit ? "Exit" : "Entry"}
-          />
-        </View>
-        <CustomText title="Date" value={lastEntryDate} />
-        <CustomText title="Comment" value={lastEntryInfo.comment} />
+        {!lastEntryInfo.isEmpty() && (
+          <>
+            <View style={styles.panelSectorAction}>
+              <CustomText
+                flex={1}
+                title="Sector"
+                value={lastEntryInfo.sector}
+              />
+              <CustomText
+                flex={1}
+                title="Action"
+                value={lastEntryInfo.exit ? "Exit" : "Entry"}
+              />
+            </View>
+            <CustomText title="Date" value={lastEntryDate} />
+            <CustomText title="Comment" value={lastEntryInfo.comment} />
+          </>
+        )}
+        {lastEntryInfo.isEmpty() && (
+          <Panel horizontalCenter={true} paddingHorizontal={20}>
+            <Text category="h6">Without last entry record</Text>
+          </Panel>
+        )}
       </Panel>
       <Panel level="7" style={styles.panelOptions}>
         <CButton
