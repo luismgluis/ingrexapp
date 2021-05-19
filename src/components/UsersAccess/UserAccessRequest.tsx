@@ -57,7 +57,10 @@ const UserAccessRequest: React.FC<UserAccessRequestProps> = ({
     });
     module
       .openTelegram(resident, visitor)
-      .then((res) => setConfirmationOptions(res))
+      .then((res) => {
+        console.log(TAG, "open telegram result", res);
+        setConfirmationOptions(res);
+      })
       .catch((err) => console.log(TAG, err));
     //const sp = Platform.OS === "ios" ? "&" : "?";
   }, [confirmationOptions, resident, visitor, module]);
@@ -150,23 +153,22 @@ const UserAccessRequest: React.FC<UserAccessRequestProps> = ({
             </Panel>
           )}
           <View>
-            <Panel flex={1}>
-              {confirmationOptions.answer == null ||
-                (confirmationOptions.answer === "NO" && (
-                  <CButton
-                    status="danger"
-                    paddingVertical={30}
-                    paddingHorizontal={80}
-                    onPress={() =>
-                      setConfirmationOptions({
-                        ...confirmationOptions,
-                        message: "",
-                        enabled: false,
-                      })
-                    }
-                    text="Cancel"
-                  />
-                ))}
+            <Panel>
+              {confirmationOptions.answer === "NO" && (
+                <CButton
+                  status="danger"
+                  paddingVertical={30}
+                  paddingHorizontal={80}
+                  onPress={() =>
+                    setConfirmationOptions({
+                      ...confirmationOptions,
+                      message: "",
+                      enabled: false,
+                    })
+                  }
+                  text="Cancel"
+                />
+              )}
               {confirmationOptions.answer === "YES" && (
                 <CButton
                   paddingVertical={30}

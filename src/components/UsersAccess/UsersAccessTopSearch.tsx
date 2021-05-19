@@ -13,6 +13,7 @@ import Panel from "../Panel/Panel";
 import UserAccessSearch from "./UserAccessSearch/UserAccessSearch";
 import { ResidentType } from "../../libs/types/ResidentType";
 import HomeSearchIcon from "../Icons/UsersAccess/HomeSearchIcon";
+import IdCardIcon from "../Icons/UsersAccess/IdCardIcon";
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -65,7 +66,6 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
     : RNCamera.Constants.FlashMode.off;
 
   const [searchSelected, setSearchSelected] = useState("idCard");
-  const [idCard, setIdCard] = useState("");
 
   const onSuccess = (data: ResidentType) => {
     console.log(TAG, data);
@@ -75,7 +75,6 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
   const onQRRead = (data) => {
     console.log(TAG, data);
   };
-  /**/
   return (
     <>
       <View style={styles.container}>
@@ -109,7 +108,7 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
         <ButtonOption
           selected={searchSelected === "idCard"}
           iconComponent={
-            <NumbersIcon
+            <IdCardIcon
               color={theme["color-primary-500"]}
               width={buttonsOptionsSize}
               height={buttonsOptionsSize}

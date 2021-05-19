@@ -1,4 +1,5 @@
 import CameraRoll from "@react-native-community/cameraroll";
+import { Icon, TopNavigationAction } from "@ui-kitten/components";
 import React, { useEffect, useState, useCallback } from "react";
 import utils from "../../libs/utils/utils";
 import CTopBack from "../CTopBack/CTopBack";
@@ -37,9 +38,19 @@ const Album: React.FC<AlbumProps> = ({ navigation, route, callBack }) => {
     }
   }, [callBack, refresh, mediaCounter]);
 
+  const cameraButton = (
+    <TopNavigationAction
+      onPress={() => console.log(TAG, "opencam")}
+      icon={(props) => <Icon {...props} name="camera-outline" />}
+    />
+  );
   return (
     <Panel level="5" totalHeight={0}>
-      <CTopBack title="Gallery" onBackPress={() => navigation.goBack()} />
+      <CTopBack
+        title="Gallery"
+        onBackPress={() => navigation.goBack()}
+        rightButton={cameraButton}
+      />
       <FeedImages
         arrayImages={dataImages}
         isRefresh={refreshing}

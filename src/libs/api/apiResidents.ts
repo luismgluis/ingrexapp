@@ -66,6 +66,9 @@ export class ApiResidents {
     const arrReplyOptions = replyOptions
       .map((item) => item.replace("|", ","))
       .join("|");
+
+    const fireColletion = firestore().collection("telegram_users_replies");
+
     const goodReply = () => {
       let customCallBack = (reply: TelegramUsersReplies) => null;
       const onResult = (result) => {
@@ -75,8 +78,7 @@ export class ApiResidents {
       const onError = () => {
         customCallBack(null);
       };
-      const listener = firestore()
-        .collection("telegram_users_replies")
+      const listener = fireColletion
         .doc(telegramInfo.id)
         .onSnapshot(onResult, onError);
 
@@ -91,7 +93,7 @@ export class ApiResidents {
       };
     };
     const sendMsj = (resolve: (res: callBackStop) => void, reject) => {
-      console.log(TAG, true);
+      fireColletion.doc(telegramInfo.id).update({ reply: "" });
       axios
         .post(
           "https://us-east1-accessatelegrambot1.cloudfunctions.net/sendBotMessage",

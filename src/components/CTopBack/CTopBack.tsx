@@ -28,11 +28,13 @@ type CTopBackProps = {
   title: string;
   subtitle?: string;
   onBackPress: () => void;
+  rightButton?: JSX.Element;
 };
 const CTopBack: React.FC<CTopBackProps> = ({
   title = "",
   subtitle = "",
   onBackPress,
+  rightButton = <></>,
 }) => {
   const [menuVisible, setMenuVisible] = React.useState(false);
 
@@ -60,13 +62,15 @@ const CTopBack: React.FC<CTopBackProps> = ({
   const renderBackAction = () => (
     <TopNavigationAction onPress={onBackPress} icon={BackIcon} />
   );
+
   const topProps = {
     alignment: "center",
     title: undefined,
     subtitle: undefined,
     accessoryLeft: renderBackAction,
-    accessoryRight: renderRightActions,
+    accessoryRight: () => rightButton,
   };
+
   if (subtitle !== "") {
     topProps.title = title;
     topProps.subtitle = subtitle;
@@ -78,8 +82,7 @@ const CTopBack: React.FC<CTopBackProps> = ({
     );
   }
   const topNavStyles = { backgroundColor: "transparent" };
-  /*
-        accessoryRight={topProps.accessoryRight} */
+  /* accessoryRight={topProps.accessoryRight}*/
   return (
     <Panel style={styles.container} level="6">
       <TopNavigation
@@ -87,6 +90,7 @@ const CTopBack: React.FC<CTopBackProps> = ({
         title={topProps.title}
         subtitle={topProps.subtitle}
         accessoryLeft={topProps.accessoryLeft}
+        accessoryRight={topProps.accessoryRight}
       />
     </Panel>
   );

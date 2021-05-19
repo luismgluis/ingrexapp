@@ -61,7 +61,7 @@ export class UserAccessModule {
       const alert = CAlertInfo(
         "Access enabled",
         msj === ""
-          ? `The resident has accepted ${visitor.name}'s admission to sector ${currentResidentSelect.sector}.`
+          ? `The resident has accepted ${visitor.name}'s access to sector ${currentResidentSelect.sector}.`
           : msj,
       );
       if (!currentResidentSelect.isEmpty()) {
@@ -94,7 +94,7 @@ export class UserAccessModule {
           }}
         />,
         () => onConfirm(false),
-        true,
+        false,
       );
     };
 
@@ -164,6 +164,7 @@ export class UserAccessModule {
     };
 
     const sendMsj = (resolve: (data) => void, reject) => {
+      const now = utils.dates.dateNowUnix();
       api.residents
         .sendTelegramMessage(resident, msj, replyButtons)
         .then((result) => {
@@ -174,6 +175,10 @@ export class UserAccessModule {
             }
             if (reply.reply === "") {
               reject(null);
+              return;
+            }
+            const restDates = now - reply.creationDate;
+            if (restDates > 60 * 30) {
               return;
             }
             const res = analiceReply(reply.reply);
