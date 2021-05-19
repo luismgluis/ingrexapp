@@ -1,17 +1,20 @@
-import CameraRoll from "@react-native-community/cameraroll";
 import { Icon, TopNavigationAction } from "@ui-kitten/components";
 import React, { useEffect, useState, useCallback } from "react";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import utils from "../../libs/utils/utils";
 import CTopBack from "../CTopBack/CTopBack";
 import FeedImages, { FeedImageType } from "../FeedImages/FeedImages";
 import Panel from "../Panel/Panel";
+import { launchCamera } from "react-native-image-picker";
+import { useNavigation } from "@react-navigation/core";
+
 const TAG = "ALBUM";
 type AlbumProps = {
-  navigation: any;
-  route: any;
   callBack: (data: FeedImageType) => void;
 };
-const Album: React.FC<AlbumProps> = ({ navigation, route, callBack }) => {
+const Album: React.FC<AlbumProps> = ({ callBack }) => {
+  const navigation = useNavigation();
+
   const [dataImages, setDataImages] = useState<Array<FeedImageType>>([]);
   const [mediaCounter, setMediaCounter] = useState(0);
   const [refreshing, setRefreshing] = useState(true);
@@ -26,7 +29,7 @@ const Album: React.FC<AlbumProps> = ({ navigation, route, callBack }) => {
           setMediaCounter(mediaCounter + 10);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         setDataImages([]);
         setRefreshing(false);
       });
@@ -38,11 +41,38 @@ const Album: React.FC<AlbumProps> = ({ navigation, route, callBack }) => {
     }
   }, [callBack, refresh, mediaCounter]);
 
+  const startCamera = useCallback(() => {
+    launchCamera(
+      {
+        mediaType: "photo",
+        maxWidth: 520,
+        saveToPhotos: false,
+      },
+      (data) => {
+        if (data.didCancel) {
+          return;
+        }
+        callBack({
+          key: utils.generateKey("cameraimage"),
+          uri: data.uri,
+          type: data.type,
+          timeStamp: utils.dates.dateNowUnix(),
+          title: "Camera Picture",
+          isVideo: false,
+          imageFromCamera: true,
+          update: (d: FeedImageType) => null,
+          onPress: (d: FeedImageType) => null,
+        });
+      },
+    );
+  }, [callBack]);
+
   const cameraButton = (
-    <TopNavigationAction
-      onPress={() => console.log(TAG, "opencam")}
-      icon={(props) => <Icon {...props} name="camera-outline" />}
-    />
+    <TouchableWithoutFeedback onPress={() => startCamera()}>
+      <TopNavigationAction
+        icon={(props) => <Icon {...props} name="camera-outline" />}
+      />
+    </TouchableWithoutFeedback>
   );
   return (
     <Panel level="5" totalHeight={0}>

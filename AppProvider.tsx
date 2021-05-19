@@ -14,7 +14,6 @@ import { useSelector } from "react-redux";
 import AppNav from "./AppNav";
 import themeStyleOne from "./src/themes/one.json";
 import themeStyleTwo from "./src/themes/two.json";
-import FatherPanel from "./src/components/FatherPanel/FatherPanel";
 import utils from "./src/libs/utils/utils";
 import AppMain from "./AppMain";
 

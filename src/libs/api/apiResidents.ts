@@ -293,4 +293,13 @@ export class ApiResidents {
       }
     });
   }
+  getAccessHistory(): Promise<ResidentAccess[]> {
+    return new Promise<ResidentAccess[]>((resolve, reject) => {
+      try {
+        resolve([]);
+      } catch (error) {
+        reject(null);
+      }
+    });
+  }
 }

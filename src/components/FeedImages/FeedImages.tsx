@@ -76,6 +76,7 @@ export interface FeedImageType {
   duration?: number;
   dimensions?: string;
   isVideo: boolean;
+  imageFromCamera?: boolean;
   update: (data: FeedImageType) => void;
   onPress: (data: FeedImageType) => void;
 }

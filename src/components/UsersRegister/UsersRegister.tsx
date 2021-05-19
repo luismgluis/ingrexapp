@@ -4,14 +4,19 @@ import Panel from "../Panel/Panel";
 import { Icon, Text, Toggle, useTheme } from "@ui-kitten/components";
 import CInput from "../CInput/CInput";
 import CButton from "../CButton/CButton";
-import UserRegisterOtherData from "./UserRegisterOtherData";
 import api from "../../libs/api/api";
 import { ResidentType } from "../../libs/types/ResidentType";
-import { CAlertLoading, CAlertQuestion } from "../CAlert/CAlertNotification";
+import {
+  CAlertInfo,
+  CAlertLoading,
+  CAlertQuestion,
+} from "../CAlert/CAlertNotification";
 import utils from "../../libs/utils/utils";
 import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import CameraIcon from "./../Icons/others/CameraICon";
 import PerfilAvatar from "../Perfil/PerfilAvatar/PerfilAvatar";
+import { FeedImageType } from "../FeedImages/FeedImages";
+import { InvokeQrScanner } from "../QRScanner/QRScannerModule";
 
 const styles = StyleSheet.create({
   container: {},
@@ -32,12 +37,11 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
   const theme = useTheme();
   const [checkResident, setCheckResident] = useState(false);
   const [form, setForm] = useState({
-    name: "Luis",
-    sector: "F204",
-    idCard: "1144223355",
-    qr: "ABC123",
-    telegram: "jhonjones123",
-    phone: "3166478046",
+    name: "",
+    sector: "",
+    idCard: "",
+    qr: "AFF5562",
+    phone: "",
     profileImage: "",
     isVisitor: true,
   });
@@ -84,7 +88,7 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
       sector: form.sector,
       idCard: form.idCard,
       qr: form.qr,
-      telegram: form.telegram.replace(" ", "").replace("@", ""),
+      telegram: "",
       phone: form.phone,
       profileImage: form.profileImage,
       isVisitor: !checkResident,
@@ -119,6 +123,37 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
       });
   }, [form, cleanForm, checkResident]);
 
+  const onImageSelect = (data: FeedImageType) => {
+    if (!data.imageFromCamera) {
+      CAlertInfo(
+        "Imagen Rechazada",
+        "Aqui solo puedes ingresar fotografias tomadas en el momento",
+      );
+      return;
+    }
+    setForm({
+      ...form,
+      profileImage: data.uri,
+    });
+  };
+
+  const onQrSelect = useCallback(
+    (qrScanned: string) => {
+      if (!(qrScanned.length > 0)) {
+        return;
+      }
+      setForm({
+        ...form,
+        qr: qrScanned,
+      });
+    },
+    [form],
+  );
+
+  const goQrCamera = InvokeQrScanner((text) => {
+    onQrSelect(text);
+  });
+
   return (
     <Panel horizontalCenter={true} style={styles.container}>
       <Panel style={styles.panelTitle} level="6">
@@ -131,12 +166,7 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
               <PerfilAvatar
                 imageUri={form.profileImage}
                 changeButtonEnabled={true}
-                onSelect={(data) =>
-                  setForm({
-                    ...form,
-                    profileImage: data.uri,
-                  })
-                }
+                onSelect={(data) => onImageSelect(data)}
               />
             </Panel>
             <CInput
@@ -168,16 +198,6 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
               label="Phone (*)"
               placeholder="3884545"
             />
-            <CInput
-              paddingVertical={20}
-              value={form.telegram}
-              onChangeText={formChange("telegram")}
-              keyboardType="default"
-              label="Telegram user (*)"
-              placeholder="jhones123"
-              accessoryLeft={(props) => <Icon {...props} name={"at-outline"} />}
-              caption="Required to receive qrcode."
-            />
           </>
           <Toggle checked={checkResident} onChange={setCheckResident}>
             {"Register as a resident"}
@@ -197,14 +217,13 @@ const UsersRegister: React.FC<UsersRegisterProps> = ({ pagerFocus }) => {
               <CInput
                 paddingVertical={20}
                 value={form.qr}
-                onChangeText={formChange("qr")}
+                onChangeText={() => null}
                 accessoryLeft={(props) => (
                   <Icon {...props} name={"minus-square-outline"} />
                 )}
                 label="QR assigned"
                 accessoryRight={(props) => (
-                  <TouchableWithoutFeedback
-                    onPress={() => console.log(TAG, "press")}>
+                  <TouchableWithoutFeedback onPress={() => goQrCamera()}>
                     <CameraIcon
                       width={25}
                       height={25}

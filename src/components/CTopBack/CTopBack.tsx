@@ -10,6 +10,7 @@ import {
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import Panel from "../Panel/Panel";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const styles = StyleSheet.create({ container: { width: "100%" } });
 
@@ -43,7 +44,9 @@ const CTopBack: React.FC<CTopBackProps> = ({
   };
 
   const renderMenuAction = () => (
-    <TopNavigationAction icon={MenuIcon} onPress={toggleMenu} />
+    <TouchableWithoutFeedback onPress={toggleMenu}>
+      <TopNavigationAction icon={MenuIcon} />
+    </TouchableWithoutFeedback>
   );
 
   const renderRightActions = () => (
@@ -60,7 +63,9 @@ const CTopBack: React.FC<CTopBackProps> = ({
   );
 
   const renderBackAction = () => (
-    <TopNavigationAction onPress={onBackPress} icon={BackIcon} />
+    <TouchableWithoutFeedback onPress={onBackPress}>
+      <TopNavigationAction icon={BackIcon} />
+    </TouchableWithoutFeedback>
   );
 
   const topProps = {

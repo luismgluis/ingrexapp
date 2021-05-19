@@ -13,6 +13,7 @@ import UserType from "./src/libs/types/UserType";
 import utils from "./src/libs/utils/utils";
 import { setCurrentReduxUser } from "./src/reducers/actions/actionsCurrentSession";
 import { useNavigation } from "@react-navigation/core";
+import QRScannerScreen from "./src/components/QRScanner/QRScannerScreen";
 const TAG = "APP NAV";
 
 const { Navigator, Screen } = createStackNavigator();
@@ -75,7 +76,7 @@ const AppNav: React.FC = () => {
       //unsubs();
     };
   }, [dispatch]);
-
+  /* */
   return (
     <Navigator
       key={navigatorKey}
@@ -87,6 +88,7 @@ const AppNav: React.FC = () => {
       <Screen name="Gallery" component={Gallery} />
       <Screen name="ImageViewer" component={ImageViewer} />
       <Screen name="Login" component={LoginStack} />
+      <Screen name="QrScanner" component={QRScannerScreen} />
     </Navigator>
   );
 };

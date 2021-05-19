@@ -14,6 +14,7 @@ import UserAccessSearch from "./UserAccessSearch/UserAccessSearch";
 import { ResidentType } from "../../libs/types/ResidentType";
 import HomeSearchIcon from "../Icons/UsersAccess/HomeSearchIcon";
 import IdCardIcon from "../Icons/UsersAccess/IdCardIcon";
+import QRScanner from "../QRScanner/QRScanner";
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -61,9 +62,6 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
   const buttonsOptionsSize = 50;
 
   const [torchEnabled, setTorchEnabled] = useState(false);
-  const flashMode = torchEnabled
-    ? RNCamera.Constants.FlashMode.torch
-    : RNCamera.Constants.FlashMode.off;
 
   const [searchSelected, setSearchSelected] = useState("idCard");
 
@@ -80,10 +78,9 @@ const UsersAccessTopSearch: React.FC<UsersAccessTopSearchProps> = ({
       <View style={styles.container}>
         {searchSelected === "" ||
           (searchSelected === "qr" && (
-            <QRCodeScanner
-              onRead={(e) => onQRRead(e.data)}
-              flashMode={flashMode}
-              topContent={<Text>Scan.</Text>}
+            <QRScanner
+              onRead={(text) => onQRRead(text)}
+              torchEnabled={torchEnabled}
             />
           ))}
         {searchSelected === "idCard" && (
