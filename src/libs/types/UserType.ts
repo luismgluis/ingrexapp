@@ -15,17 +15,14 @@ export default class UserType implements UserTypeX {
   profileImage?: string;
   localSaveCreationDate?: number;
   creationDate: number;
-  constructor(id: string, data: any, datax: UserTypeX | null = null) {
-    if (datax !== null) {
-      data = datax;
-    }
+  constructor(id: string, data: UserTypeX | null = null) {
     this.id = id;
-    this.name = data.name || "";
-    this.email = data.email || "";
-    this.nickname = data.nickname || "";
-    this.creationDate = data.creationDate || 0;
-    this.profileImage = data.profileImage || "";
-    this.localSaveCreationDate = data.localSaveCreationDate || 0;
+    this.name = data?.name || "";
+    this.email = data?.email || "";
+    this.nickname = data?.nickname || "";
+    this.creationDate = data?.creationDate || 0;
+    this.profileImage = data?.profileImage || "";
+    this.localSaveCreationDate = data?.localSaveCreationDate || 0;
   }
   isEmpty(): boolean {
     if (this.id === "" || this.name === "") {

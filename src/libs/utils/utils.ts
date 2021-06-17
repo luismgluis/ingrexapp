@@ -17,21 +17,21 @@ class Utils extends generalUtils {
   constructor() {
     super();
     this.dates = new Dates();
-    this.media = new Media();
     this.objects = new Objects();
+    this.media = new Media();
     /* generateKey = (pre) => {
     return `${pre}_${new Date().getTime()}`;
     };*/
   }
 
-  getRandomNumber(min, max) {
+  getRandomNumber(min: number, max: number) {
     return Math.random() * (max - min) + min;
   }
   rulethree(valueA: number, valueAEqual: number, valueB: number) {
     //si valueA seria valueAEqual entonces valueB seria... return
     return (valueAEqual * valueB) / valueA;
   }
-  createDirectory(pathBase, path) {
+  createDirectory(pathBase: string, path: string) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         await RNFS.exists(`${pathBase}/${path}`)
@@ -56,7 +56,7 @@ class Utils extends generalUtils {
       }
     });
   }
-  createFile(path, fileName, directory = "CACHE") {
+  createFile(path: string, fileName: string, directory = "CACHE") {
     const that = this;
     const pathDir = ((): string => {
       if (directory === "CACHE") {
@@ -97,12 +97,6 @@ class Utils extends generalUtils {
         reject(null);
       }
     });
-  }
-  encodeBase64(text: string): string {
-    return btoa(text);
-  }
-  decodeBase64(text: string): string {
-    return atob(text);
   }
 
   timeOut(milisecs: number) {

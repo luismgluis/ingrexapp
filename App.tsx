@@ -42,8 +42,8 @@ const TAG = "APP PRINCIPAL";
 const App: React.FC = () => {
   const [colorBar, setColorBar] = useState("#006793");
   const changeColor = React.useMemo(() => {
-    return (color) => {
-      setColorBar(color);
+    return (color: string) => {
+      setColorBar(color); //useCallback?
     };
   }, [setColorBar]);
 

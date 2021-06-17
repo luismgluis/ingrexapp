@@ -17,7 +17,7 @@ export default class RoomMessageType {
   fileTime?: number;
   fileDimensions?: string;
   updateView?: (module: string) => void;
-  constructor(id: string, data) {
+  constructor(id: string, data: any | null) {
     this.id = id;
     this.text = data.text || "";
     this.creator = data.creator || "";

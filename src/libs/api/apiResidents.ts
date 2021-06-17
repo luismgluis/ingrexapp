@@ -32,7 +32,7 @@ export class ApiResidents {
           .get()
           .then((data) => {
             console.log(TAG, data);
-            const arrData = [];
+            const arrData: any = [];
             data.forEach((doc) => {
               console.log(TAG, doc.data());
               const telegramInfo = {
@@ -70,20 +70,21 @@ export class ApiResidents {
     const fireColletion = firestore().collection("telegram_users_replies");
 
     const goodReply = () => {
-      let customCallBack = (reply: TelegramUsersReplies) => null;
-      const onResult = (result) => {
+      let customCallBack = (reply: TelegramUsersReplies | null) => null;
+      const onResult = (result: any) => {
         const data = result.data();
         customCallBack(data);
       };
       const onError = () => {
         customCallBack(null);
       };
+      console.log(TAG, "telegraminfo", telegramInfo);
       const listener = fireColletion
         .doc(telegramInfo.id)
         .onSnapshot(onResult, onError);
 
       return {
-        setCallBack: (callBackfun) => {
+        setCallBack: (callBackfun: any) => {
           customCallBack = callBackfun;
         },
         stopListener: () => {
@@ -92,7 +93,7 @@ export class ApiResidents {
         },
       };
     };
-    const sendMsj = (resolve: (res: callBackStop) => void, reject) => {
+    const sendMsj = (resolve: (res: callBackStop) => void, reject: any) => {
       fireColletion.doc(telegramInfo.id).update({ reply: "" });
       axios
         .post(
@@ -148,15 +149,13 @@ export class ApiResidents {
         resi.profileImage = "";
 
         const newResiRef = firestore()
-          .collection("groups_residents")
+          .collection("group")
           .doc(currentGroup)
           .collection("residents")
           .doc();
-        ///groups_residents/bPiR5KBVUjkiiaHyKWNs/residents/Xv946lrYWlINooNrHGtv
-
         const saveImage = (residentID = "") => {
           that.storage.saveFile(
-            `/groups_residents/${currentGroup}/residents/${residentID}/profileImage`,
+            `/group/${currentGroup}/residents/${residentID}/profileImage`,
             profileImageUri,
             (p) => {
               console.log(TAG, "progress upload", p);
@@ -190,7 +189,7 @@ export class ApiResidents {
       try {
         try {
           const newResiRef = firestore()
-            .collection("groups_residents")
+            .collection("group")
             .doc(currentGroup)
             .collection("residents")
             .where(type, "==", value)
@@ -198,7 +197,7 @@ export class ApiResidents {
             .then((data) => {
               const result: Array<ResidentType> = [];
               data.forEach((doc) => {
-                result.push(new ResidentType(doc.id, doc.data()));
+                result.push(new ResidentType(doc.id, <any>doc.data()));
               });
               console.log(TAG, result);
               if (result.length > 0) {
@@ -227,7 +226,7 @@ export class ApiResidents {
     return new Promise<Array<ResidentAccess>>((resolve, reject) => {
       try {
         firestore()
-          .collection("groups_access")
+          .collection("groups")
           .doc(currentGroup)
           .collection("access")
           .where("residentID", "==", resident.id)
@@ -236,7 +235,7 @@ export class ApiResidents {
           .then((data) => {
             const result: Array<ResidentAccess> = [];
             data.forEach((doc) => {
-              result.push(new ResidentAccess(doc.id, doc.data()));
+              result.push(new ResidentAccess(doc.id, <any>doc.data()));
             });
             if (result.length > 0) {
               resolve(result);
@@ -261,23 +260,19 @@ export class ApiResidents {
     const that = this;
     const currentGroup = that.group.currentGroup;
 
-    const newAccess = new ResidentAccess(
-      "",
-      {},
-      {
-        validatorID: resident.id,
-        residentID: visitor.id,
-        comment: "",
-        creationDate: utils.dates.dateNowUnix(),
-        sector: resident.sector,
-        exit: exit,
-      },
-    );
+    const newAccess = new ResidentAccess("", {
+      validatorID: resident.id,
+      residentID: visitor.id,
+      comment: "",
+      creationDate: utils.dates.dateNowUnix(),
+      sector: resident.sector,
+      exit: exit,
+    });
 
     return new Promise<string>((resolve, reject) => {
       try {
         const newAccessRef = firestore()
-          .collection("groups_access")
+          .collection("groups")
           .doc(currentGroup)
           .collection("access")
           .doc();

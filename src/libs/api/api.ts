@@ -21,26 +21,28 @@ class Api {
   currentPlayerSouds: playerSounds;
   static instance: any;
   constructor() {
-    if (typeof Api.instance === "object") {
-      return Api.instance;
-    }
-    Api.instance = this;
+    this.currentGroup = "";
     this.users = new ApiUsers();
     this.group = new ApiGroup();
     this.storage = new ApiStorage();
     this.room = new ApiRoom();
     this.residents = new ApiResidents();
     this.currentPlayerSouds = new playerSounds();
+    if (typeof Api.instance === "object") {
+      return Api.instance;
+    }
+    Api.instance = this;
+
     return this;
   }
-  checkLoginByEmail(email, pass) {
+  checkLoginByEmail(email: string, pass: string) {
     const that = this;
-
-    function login(resolve, reject) {
+    console.log(TAG, "login by", email);
+    function login(resolve: any, reject: any) {
       auth() //'grajales805@gmail.com', 'elpepe'
         .signInWithEmailAndPassword(email, pass)
         .then(() => {
-          const me = auth().currentUser;
+          const me = auth().currentUser!;
           that.users
             .getUserByID(me.uid)
             .then((data) => {
@@ -49,7 +51,7 @@ class Api {
             })
             .catch((err) => {
               console.error(TAG, err);
-              that.users.currentUser = new UserType("", {});
+              that.users.currentUser = new UserType("", null);
               resolve(false);
             });
         })
@@ -83,7 +85,7 @@ class Api {
       .signOut()
       .then(() => console.warn("User signed out!"));
   }
-  createUserWithEmail(data) {
+  createUserWithEmail(data: any) {
     const that = this;
 
     const avaibleToCreate = async () => {
@@ -93,8 +95,8 @@ class Api {
       }
       return true;
     };
-    const saveInfo = (uid, resolve, reject) => {
-      const user = new UserType(uid, null, {
+    const saveInfo = (uid: any, resolve: any, reject: any) => {
+      const user = new UserType(uid, {
         id: uid,
         name: data.name,
         nickname: data.nickname,
@@ -113,7 +115,7 @@ class Api {
           console.error(TAG, "err", err);
         });
     };
-    const create = (resolve, reject) => {
+    const create = (resolve: any, reject: any) => {
       auth()
         .createUserWithEmailAndPassword(data.email, data.password1)
         .then((result) => {

@@ -14,17 +14,17 @@ class ApiRoom {
     this.apiStorage = new ApiStorage();
   }
   getRoomMessages(
-    roomID: string,
+    idRoom: string,
     setMessages: (data: Array<RoomMessageType>) => void,
     creationDateLimit?: number,
     intents = 0,
-  ): () => void {
+  ): any {
     const that = this;
     if (intents > 20) {
       setMessages([]);
-      return;
+      return () => null;
     }
-    const roomsCollection = firestore().collection("groups_chat_rooms");
+    const groupColletion = firestore().collection("chat_rooms");
 
     function onResult(
       snap: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
@@ -40,31 +40,28 @@ class ApiRoom {
       setMessages(arr);
     }
 
-    function onError(error) {
+    function onError(error: any) {
       console.error(TAG, "try again get room messages", error);
       if (`${error}`.includes("firestore/permission-denied")) {
         return;
       }
-      that.getRoomMessages.call(that, roomID, setMessages, intents);
+      that.getRoomMessages.call(that, idRoom, setMessages, intents);
     }
-
-    const unSubs = (() => {
-      if (creationDateLimit == null) {
-        return roomsCollection
-          .doc(roomID)
+    const unSubs = creationDateLimit
+      ? groupColletion
+          .doc(idRoom)
           .collection("messages")
+          .where("creationDate", "<", creationDateLimit)
+          .orderBy("creationDate", "asc")
+          .limitToLast(20)
+          .onSnapshot(onResult, onError)
+      : groupColletion
+          .doc(idRoom)
+          .collection("messages")
+          .where("creationDate", "<", creationDateLimit)
           .orderBy("creationDate", "asc")
           .limitToLast(20)
           .onSnapshot(onResult, onError);
-      }
-      return roomsCollection
-        .doc(roomID)
-        .collection("messages")
-        .where("creationDate", "<", creationDateLimit)
-        .orderBy("creationDate", "asc")
-        .limitToLast(20)
-        .onSnapshot(onResult, onError);
-    })();
 
     return unSubs;
   }
@@ -86,7 +83,7 @@ class ApiRoom {
       console.error(TAG, "Fail exportTo upload");
       return;
     }
-    const roomsCollection = firestore().collection("groups_chat_rooms");
+    const roomsCollection = firestore().collection("chat_rooms");
     const newMessage = roomsCollection.doc(roomID).collection("messages").doc();
 
     const saveMessage = (messageData: RoomMessageType) => {
@@ -105,16 +102,16 @@ class ApiRoom {
         });
     };
     const saveImage = () => {
-      const filePath = `groups_chat_rooms/${roomID}/messages/${newMessage.id}`;
+      const filePath = `chat_rooms/${roomID}/messages/${newMessage.id}`;
       that.apiStorage.saveFile(
         filePath,
-        msj.fileUrl,
+        msj.fileUrl!,
         (progress) => {
           /** */
         },
         (url) => {
           msj.setFileUpload(true);
-          msj.setImage(url, msj.fileDimensions);
+          msj.setImage(url, msj.fileDimensions!);
           saveMessage(msj);
         },
         (err) => {
@@ -124,16 +121,16 @@ class ApiRoom {
     };
 
     const saveAudio = () => {
-      const filePath = `groups_chat_rooms/${roomID}/messages/${newMessage.id}`;
+      const filePath = `chat_rooms/${roomID}/messages/${newMessage.id}`;
       that.apiStorage.saveFile(
         filePath,
-        msj.fileUrl,
+        msj.fileUrl!,
         (progress) => {
           /** */
         },
         (url) => {
           msj.setFileUpload(true);
-          msj.setAudio(url, msj.fileSize, msj.fileTime);
+          msj.setAudio(url, msj.fileSize!, msj.fileTime!);
           saveMessage(msj);
         },
         (err) => {

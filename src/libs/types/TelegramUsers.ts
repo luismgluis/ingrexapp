@@ -1,10 +1,13 @@
 export class TelegramUsersReplies {
-  creationDate;
-  idHistory;
-  question;
-  reply;
+  creationDate: string;
+  idHistory: string;
+  question: string;
+  reply: string;
   constructor() {
-    //
+    this.creationDate = "";
+    this.idHistory = "";
+    this.question = "";
+    this.reply = "";
   }
 }
 
@@ -16,7 +19,12 @@ export class TelegramUser {
   name;
   sector;
   constructor() {
-    //
+    this.id = "";
+    this.idTelegram = "";
+    this.idCard = "";
+    this.idGroup = "";
+    this.name = "";
+    this.sector = "";
   }
   exportToUpload() {
     return {

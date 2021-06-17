@@ -11,7 +11,7 @@ class ApiStorage {
     uri: string,
     callBackProgress: (progress: number) => void,
     resolve: (uriResult: string) => void,
-    reject: (reason: string) => void = null,
+    reject: (reason: string) => void = (data: any) => null,
   ): void {
     //const pathStorageFile = `business/${businessId}/products/${resultNewProduct.id}`;
 

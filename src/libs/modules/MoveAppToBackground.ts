@@ -1,6 +1,6 @@
 import { NativeModules } from "react-native";
 
-export const moveToBackground = (): boolean => {
+export const moveToBackground = (): any => {
   // Add your additional custom logic here
   const myModule = NativeModules.MoveAppToBackground;
   try {

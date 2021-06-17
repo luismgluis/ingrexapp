@@ -15,18 +15,16 @@ export class ChannelType {
   creationDate: number;
   creator: string;
   chatRoomID: string;
-  constructor(id: string, data: any, datax?: ChannelTypeType) {
-    if (data == null) {
-      data = datax;
-    }
+  constructor(id: string, data: ChannelTypeType | null) {
     this.id = id;
-    this.name = data.name || "";
-    this.onlyAdmins = utils.objects.isEmpty(data.onlyAdmins)
+    this.name = data?.name || "";
+    this.onlyAdmins = utils.objects.isEmpty(data?.onlyAdmins)
       ? false
-      : data.onlyAdmins;
-    this.creationDate = data.creationDate || [];
-    this.creator = data.creator || "";
-    this.chatRoomID = data.chatRoomID || "";
+      : data?.onlyAdmins!;
+
+    this.creationDate = data?.creationDate || 0;
+    this.creator = data?.creator || "";
+    this.chatRoomID = data?.chatRoomID || "";
   }
   isEmpty(): boolean {
     if (this.id === "") {
@@ -39,7 +37,7 @@ export class ChannelType {
     return {
       name: that.name || "",
       onlyAdmins: that.onlyAdmins || false,
-      creationDate: that.creationDate || [],
+      creationDate: that.creationDate || 0,
       creator: that.creator || "",
       chatRoomID: that.chatRoomID || "",
     };

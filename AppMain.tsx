@@ -7,20 +7,20 @@ import { setTotalHeight } from "./src/reducers/actions/actionsGeneralValues";
 const TAG = "APP MAIN";
 
 export class AppMainModuleAlert {
-  updateFunsArr: Array<(newVal) => void>;
+  updateFunsArr: Array<(newVal: any) => void>;
   value: any;
   closed: boolean;
   static instance: any;
   constructor() {
+    this.updateFunsArr = [];
+    this.value = null;
+    this.closed = true;
     if (typeof AppMainModuleAlert.instance === "object") {
       return AppMainModuleAlert.instance;
     }
     AppMainModuleAlert.instance = this;
-    this.updateFunsArr = [];
-    this.value = null;
-    this.closed = true;
   }
-  onUpdate(callBack: (newVal) => void): void {
+  onUpdate(callBack: (newVal: any) => void): void {
     this.updateFunsArr.push(callBack);
   }
   isClosed(): boolean {
@@ -31,7 +31,7 @@ export class AppMainModuleAlert {
       this.setChild(null);
     } catch (error) {}
   }
-  setChild(newVal = null): void {
+  setChild(newVal: any = null): void {
     if (newVal == null) {
       this.closed = true;
       newVal = <></>;

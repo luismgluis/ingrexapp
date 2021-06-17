@@ -23,18 +23,19 @@ class ApiUsers {
   getUserByIDPendings: Array<getUserByIDPendingsType>;
   static instance: any;
   constructor() {
+    this.currentUser = new UserType("", null);
+    this.getUserByIDPendings = [];
+    this.storage = new ApiStorage();
     if (typeof ApiUsers.instance === "object") {
       return ApiUsers.instance;
     }
     ApiUsers.instance = this;
-    this.currentUser = new UserType("", { name: "" });
-    this.getUserByIDPendings = [];
-    this.storage = new ApiStorage();
+
     /* */
   }
   getUserByID(uid: string): Promise<UserType> {
     const that = this;
-    const getUserFromLocal = (idUser, callBack: (res) => void) => {
+    const getUserFromLocal = (idUser: string, callBack: (res: any) => void) => {
       AsyncStorage.getItem(`getUserByID/${idUser}`)
         .then((res) => {
           if (res !== null) {
@@ -48,7 +49,10 @@ class ApiUsers {
           console.error(TAG, `getUserByID/${idUser} fail saved`, err);
         });
     };
-    const getUserFromOnline = (idUser, callBack: (res) => void) => {
+    const getUserFromOnline = (
+      idUser: string,
+      callBack: (res: any) => void,
+    ) => {
       firestore()
         .collection("users")
         .doc(uid)
@@ -65,7 +69,11 @@ class ApiUsers {
           callBack(null);
         });
     };
-    const checkPending = (idUser: string, resolve, reject): boolean => {
+    const checkPending = (
+      idUser: string,
+      resolve: any,
+      reject: any,
+    ): boolean => {
       const peds = that.getUserByIDPendings;
 
       const addPending = (userPending: getUserByIDPendingsType) => {
@@ -111,7 +119,7 @@ class ApiUsers {
       peds.push(newUserPending);
       return false;
     };
-    const resolvePendings = (idUser: string, resolve, reject) => {
+    const resolvePendings = (idUser: string, resolve: any, reject: any) => {
       const peds = that.getUserByIDPendings;
       const hasUser = utils.objects.arrayHasObjectChildEqualTo(
         peds,
@@ -168,7 +176,7 @@ class ApiUsers {
   getUserByEmail(email: string): Promise<UserType> {
     const that = this;
 
-    const getUserFromOnline = (callBack: (id, res) => void) => {
+    const getUserFromOnline = (callBack: (id: any, res: any) => void) => {
       firestore()
         .collection("users")
         .where("email", "==", email)
@@ -196,7 +204,7 @@ class ApiUsers {
             resolve(user);
             return;
           }
-          resolve(null);
+          reject(null);
         });
       } catch (error) {
         reject(null);
@@ -204,7 +212,7 @@ class ApiUsers {
     });
   }
   saveUser(user: UserType): Promise<void> {
-    const profileImageUri = user.profileImage;
+    const profileImageUri = user.profileImage ? user.profileImage : "";
     user.profileImage = "";
     this.storage.saveFile(
       `/users/${user.id}/profileImage`,
@@ -230,7 +238,7 @@ class ApiUsers {
     const that = this;
     const unsubs = auth().onAuthStateChanged((me) => {
       if (me == null) {
-        that.currentUser = new UserType("", {});
+        that.currentUser = new UserType("", null);
         onUpdate(that.currentUser);
         return;
       }
@@ -242,7 +250,7 @@ class ApiUsers {
         })
         .catch((err) => {
           console.error(TAG, err);
-          that.currentUser = new UserType("", {});
+          that.currentUser = new UserType("", null);
           onUpdate(that.currentUser);
         });
     });

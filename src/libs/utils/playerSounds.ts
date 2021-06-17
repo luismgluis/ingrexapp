@@ -2,13 +2,14 @@ import Sound from "react-native-sound";
 import api from "../api/api";
 export default class playerSounds {
   path: string;
-  sound: Sound;
+  sound: Sound | undefined;
   playing: boolean;
-  onPlay: () => void;
-  onStop: () => void;
+  onPlay: (() => void) | undefined;
+  onStop: (() => void) | undefined;
   constructor(path?: string) {
     this.path = path || "";
     this.playing = false;
+
     /* */
   }
   setPath(path: string): void {
@@ -30,12 +31,13 @@ export default class playerSounds {
       api.currentPlayerSouds = that;
       boom.play((success) => {
         that.playing = false;
-        that.onStop();
+        if (that.onStop) that.onStop();
         if (!success) {
           console.error("playback failed due to audio decoding errors");
         }
       });
-      that.onPlay();
+
+      if (that.onPlay) that.onPlay();
     });
     that.sound = boom;
     that.playing = true;
@@ -49,7 +51,7 @@ export default class playerSounds {
       that.sound?.stop();
     } catch (error) {}
     try {
-      that.onStop();
+      if (that.onStop) that.onStop();
     } catch (error) {}
   }
 }

@@ -23,15 +23,14 @@ export class ResidentAccess implements ResidentAccessType {
   validatorID: string;
   sector: string;
   exit: boolean;
-  constructor(id, datax, data: ResidentAccessType = null) {
-    if (data == null) data = datax;
+  constructor(id: string, data: ResidentAccessType | null) {
     this.id = id;
-    this.comment = data.comment || "";
-    this.creationDate = data.creationDate || 0;
-    this.residentID = data.residentID || "";
-    this.sector = data.sector || "";
-    this.validatorID = data.validatorID || "";
-    this.exit = utils.objects.isEmpty(data.exit) ? false : data.exit;
+    this.comment = data?.comment || "";
+    this.creationDate = data?.creationDate || 0;
+    this.residentID = data?.residentID || "";
+    this.sector = data?.sector || "";
+    this.validatorID = data?.validatorID || "";
+    this.exit = utils.objects.isEmpty(data?.exit) ? false : data!.exit;
   }
   isEmpty(): boolean {
     console.log(TAG, this.id);
@@ -78,22 +77,21 @@ export class ResidentType implements ResidentTypeType {
   profileImage: string;
   optionalData?: Array<OptionalDataItem>;
   isVisitor?: boolean;
-  constructor(id, datax, data: ResidentTypeType = null) {
-    if (data == null) {
-      data = datax;
-    }
+  constructor(id: string, data: ResidentTypeType | null) {
     this.id = id;
-    this.name = data.name || "";
-    this.sector = data.sector || "";
-    this.idCard = data.idCard || "";
-    this.qr = data.qr || "";
-    this.telegram = data.telegram || "";
-    this.phone = data.phone || "";
-    this.profileImage = data.profileImage || "";
-    this.isVisitor = utils.objects.isEmpty(data.isVisitor)
+    this.name = data?.name || "";
+    this.sector = data?.sector || "";
+    this.idCard = data?.idCard || "";
+    this.qr = data?.qr || "";
+    this.telegram = data?.telegram || "";
+    this.phone = data?.phone || "";
+    this.profileImage = data?.profileImage || "";
+    this.isVisitor = utils.objects.isEmpty(data?.isVisitor)
       ? true
-      : data.isVisitor;
-    this.optionalData = this.parseOptionalData(data.optionalData);
+      : data!.isVisitor;
+    this.optionalData = data!.optionalData
+      ? this.parseOptionalData(data!.optionalData)
+      : [];
   }
   isEmpty(): boolean {
     if (this.id === "") {

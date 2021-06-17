@@ -1,6 +1,6 @@
 import { PermissionsAndroid } from "react-native";
-const TAG = "PERMISSIONS";
-const requestPermission = async (title, message, permissiontype) => {
+const TAG = "PERMISSIONS"; 
+const requestPermission = async (title:any, message:any, permissiontype:any) => {
   try {
     const granted = await PermissionsAndroid.request(permissiontype, {
       title: title,
@@ -49,7 +49,7 @@ const requestWriteFilesPermission = async () => {
   );
 };
 
-const checkPermission = async (permission) => {
+const checkPermission = async (permission:any) => {
   try {
     const res = await PermissionsAndroid.check(permission);
 

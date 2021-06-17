@@ -14,7 +14,7 @@ export default class generalUtils {
     }
     return false;
   }
-  analiceAnswerYesNo(text): "YES" | "NO" | null {
+  analiceAnswerYesNo(text: string): "YES" | "NO" | null {
     const regexYes = [
       /\byes+\b/i,
       /\bsi+\b/i,
@@ -35,10 +35,10 @@ export default class generalUtils {
       /\bdenegado+\b/i,
     ];
 
-    const analice = (regex) => {
+    const analice = (regex: RegExp) => {
       const arr = text.match(regex);
       const result = [];
-      arr?.forEach((item) => {
+      arr?.forEach((item: any) => {
         result.push(item);
       });
       return result.length > 0;

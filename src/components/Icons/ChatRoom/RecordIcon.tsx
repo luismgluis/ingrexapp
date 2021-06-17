@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
 import Svg, { Circle, Path, SvgProps } from "react-native-svg";
-import { VisibleAnim } from "../../../libs/anim/VisibleAnim";
+import { VisibleAnim } from "../../../../libs/anim/VisibleAnim";
 /* SVGR has dropped some elements not supported by react-native-svg: link, style */
 const TAG = "RECORD ICON";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);

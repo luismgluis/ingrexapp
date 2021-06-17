@@ -22,7 +22,7 @@ export default class objects {
     return false;
   }
   cloneObject(obj: any): any {
-    const nb = {};
+    const nb: any = {};
     for (const key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) {
         continue;
@@ -54,8 +54,8 @@ export default class objects {
       item: null,
     };
   }
-  arrayOrderDesc(array = [], childName = "") {
-    function compare(a, b) {
+  arrayOrderDesc(array: Array<any>, childName = "") {
+    function compare(a: any, b: any) {
       if (typeof a[childName] === "undefined") {
         return 0;
       }
@@ -72,8 +72,8 @@ export default class objects {
     }
     return [...array].sort(compare); // clone and sort
   }
-  arrayOrderAsc(array = [], childName = "") {
-    function compare(a, b) {
+  arrayOrderAsc(array: Array<any>, childName = "") {
+    function compare(a: any, b: any) {
       if (typeof a[childName] === "undefined") {
         return 0;
       }

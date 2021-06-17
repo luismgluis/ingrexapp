@@ -1,9 +1,9 @@
 import { Image } from "react-native";
 import CameraRoll from "@react-native-community/cameraroll";
-import { FeedImageType } from "../../components/FeedImages/FeedImages";
 import Dates from "./dates";
 import Objects from "./objects";
 import generalUtils from "./generalUtils";
+import { FeedImageType } from "../../components/ui/FeedImages/FeedImages";
 const TAG = "UTILS MEDIA";
 type fileDimensions = {
   width: number;
@@ -35,7 +35,7 @@ export default class media {
     const that = this;
     const cameraRollAnaliceData = (result: CameraRoll.PhotoIdentifiersPage) => {
       const arr = result.edges.map((item) => item.node);
-      const dict = arr.reduce((prv, cur) => {
+      const dict = arr.reduce((prv: any, cur) => {
         const curValue = {
           type: cur.type,
           location: cur.location,
@@ -70,7 +70,7 @@ export default class media {
       }
       return originalData;
     };
-    const modelData = (element, key) => {
+    const modelData = (element: any, key: any) => {
       element.key = key;
       element.date = "";
       element.title = "";
@@ -88,7 +88,7 @@ export default class media {
         title: element.title,
         timeStamp: element.timestamp,
         duration: 0,
-        dimensions: null,
+        dimensions: "",
         update: () => {
           /* */
         },
@@ -99,7 +99,7 @@ export default class media {
       return newImageItem;
     };
 
-    const task = (resolve, reject) => {
+    const task = (resolve: any, reject: any) => {
       CameraRoll.getPhotos({
         first: maxTotalFiles,
         groupTypes: "All",
